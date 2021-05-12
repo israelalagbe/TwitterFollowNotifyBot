@@ -4,6 +4,7 @@
 //
 const Twit = require('twit');
 const getPromiseCallback = require('./getPromiseCallback');
+const { limitFollowersCall } = require('./rate_limiters');
 
 
 var Bot = function () {
@@ -70,8 +71,14 @@ Bot.prototype.tweet = function (status) {
     return promise;
 };
 
-Bot.prototype.getFollowers = function (query={}) {
-    var self = this;
+/**
+ * 
+ * @param {{user_id?:string}} query 
+ * @returns {Promise<{ids:number[], next_cursor:number}>}
+ */
+Bot.prototype.getFollowers = async function (query={}) {
+    await limitFollowersCall();
+
     const {callback, promise} = getPromiseCallback()
 
     this._twit.get('followers/ids', query, callback);

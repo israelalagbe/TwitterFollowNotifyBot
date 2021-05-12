@@ -12,7 +12,7 @@ const maxDelay = 1000 * 60 * 60 * 24 * 7;
 /**
  * @param {string} channel
  * @param {number} rate 
- * @param {number} interval  Time to wait after exheeding rate
+ * @param {number} interval  Time to wait after exheeding rate in seconds
  */
 const createLimit = (channel, rate, interval) => {
     const quota = {
@@ -30,7 +30,7 @@ const createLimit = (channel, rate, interval) => {
     return pRateLimit(qm);
 }
 
-const followerLimiterWait = createLimit('followers', 10, 60);
+const followerLimiterWait = createLimit('followers', 15, 60 * 15);
 
 module.exports = {
     limitFollowersCall: () => followerLimiterWait(()=> Promise.resolve('done'))

@@ -35,7 +35,7 @@ router.get('/', async (req, res, next) => {
  
   // const response = await Bot.tweet("Second Bot test")
   // logger.info("Item",response)
-  Bot.getFollowers()
+  // console.log(await Bot.getFollowers({user_id: 3062433100}))
   
   res.render('index', { title: 'Express' });
 });

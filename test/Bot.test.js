@@ -2,6 +2,7 @@ const Twit = require('twit');
 const Bot = require('../helpers/Bot');
 const getPromiseCallback = require('../helpers/getPromiseCallback');
 
+
 jest.mock('twit', () => class {
   post(_, __, callback) {
     callback(null, 'Response')
@@ -11,6 +12,14 @@ jest.mock('twit', () => class {
   }
 
 });
+
+jest.mock('../helpers/rate_limiters', () => ({
+  limitFollowersCall(){
+    return Promise.resolve("yes")
+  }
+
+}))
+
 
 describe('Bot Test', () => {
   beforeEach(() => {
@@ -79,7 +88,7 @@ describe('Bot Test', () => {
 
     expect(spy).toHaveBeenCalledWith('direct_messages/events/new', payload, expect.anything())
   })
-  
+
   it('Bot.sendDirectMessage() should return correct value', async () => {
 
     const status = "Hello everyone";
