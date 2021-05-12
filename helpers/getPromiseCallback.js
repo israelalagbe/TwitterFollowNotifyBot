@@ -1,9 +1,4 @@
-/**
- * @param {object} param
- * @param {Error} param.err
- * @param {Object} param.data
- * @param {Object} param.response
- */
+
  function getPromiseCallback() {
     let cbs = {};
 
@@ -11,7 +6,12 @@
         cbs = {resolve, reject};
     });
 
-    const callback = ({err, data, response}) => {
+    /**
+     * @param {Error} err
+     * @param {Object} data
+     * @param {Object} response
+    */
+    const callback = (err, data, response) => {
         if(err){
             return cbs.reject(err);
         }

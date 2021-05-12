@@ -3,8 +3,9 @@ const express = require('express');
 const Twit = require('twit')
 const axios = require('axios');
 const md5 = require('md5');
+const logger = require('../config/logger');
 
-const logger = require('../config/logger')
+
 
 
 
@@ -31,13 +32,7 @@ router.get('/', function(req, res, next) {
 // console.log(`${kb}KB`);
   
  
-  const T = new Twit({
-    consumer_key:         process.env.consumer_key,
-    consumer_secret:      process.env.consumer_secret,
-    access_token:         process.env.access_token,
-    access_token_secret:  process.env.access_token_secret,
-    timeout_ms:           60*1000,  // optional HTTP request timeout to apply to all requests.
-  })
+  const T = new Twit({})
 //   const payload = {
 //     event: {
 //         type: "message_create",
@@ -55,7 +50,7 @@ router.get('/', function(req, res, next) {
 //     console.log("logging data :",data);
 //     console.log("logging error :", err);
 // });
-log4js
+logger
   res.render('index', { title: 'Express' });
 
 });

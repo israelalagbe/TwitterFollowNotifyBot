@@ -2,7 +2,8 @@
 //  Bot
 //  class for performing various twitter actions
 //
-const Twit = require('twit')
+const Twit = require('twit');
+const getPromiseCallback = require('./getPromiseCallback');
 
 
 var Bot = function () {
@@ -19,7 +20,8 @@ var Bot = function () {
 //
 //  post a tweet
 //
-Bot.prototype.tweet = function (status, callback) {
+Bot.prototype.tweet = function (status) {
+    const {callback, promise} = getPromiseCallback()
     if (typeof status !== 'string') {
         return callback(new Error('tweet must be of type String'));
     } else if (status.length > 280) {
