@@ -33,10 +33,11 @@ router.get('/', async (req, res, next) => {
   
  
  
-  const response = await Bot.tweet("Second Bot test")
-  logger.info("Item",response)
+  // const response = await Bot.tweet("Second Bot test")
+  // logger.info("Item",response)
+  Bot.getFollowers()
+  
   res.render('index', { title: 'Express' });
-
 });
 
 router.get('/twitter', function(req, res, next) {

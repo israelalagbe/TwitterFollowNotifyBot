@@ -5,6 +5,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 require('dotenv').config();
 
+
 const logger2 = require('./config/logger')
 
 var indexRouter = require('./routes/index');
@@ -43,5 +44,8 @@ app.use(function(err, req, res, next) {
   logger2.error("HTTP ERROR", res.locals)
   res.render('error');
 });
+
+
+
 
 module.exports = app;

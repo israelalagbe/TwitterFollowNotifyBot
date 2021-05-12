@@ -70,32 +70,13 @@ Bot.prototype.tweet = function (status) {
     return promise;
 };
 
-Bot.prototype.getFollowers = function (callback) {
+Bot.prototype.getFollowers = function (query={}) {
     var self = this;
+    const {callback, promise} = getPromiseCallback()
 
-    this._twit.get('followers/ids', function (err, reply) {
-        if (err) {
-            return callback(err);
-        }
+    this._twit.get('followers/ids', query, callback);
 
-        var followers = reply.ids,
-            randFollower = randIndex(followers);
-
-        self._twit.get('friends/ids', {
-            user_id: randFollower
-        }, function (err, reply) {
-            if (err) {
-                return callback(err);
-            }
-
-            var friends = reply.ids,
-                target = randIndex(friends);
-
-            self._twit.post('friendships/create', {
-                id: target
-            }, callback);
-        })
-    })
+    return promise;
 };
 
 // choose a random tweet and follow that user
