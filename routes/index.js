@@ -9,7 +9,6 @@ const logger = require('../config/logger');
 
 
 
-logger.log("Hello log")
 var router = express.Router();
 
 
@@ -32,7 +31,7 @@ router.get('/', function(req, res, next) {
 // console.log(`${kb}KB`);
   
  
-  const T = new Twit({})
+ 
 //   const payload = {
 //     event: {
 //         type: "message_create",
@@ -50,7 +49,7 @@ router.get('/', function(req, res, next) {
 //     console.log("logging data :",data);
 //     console.log("logging error :", err);
 // });
-logger
+  
   res.render('index', { title: 'Express' });
 
 });

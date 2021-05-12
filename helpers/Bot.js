@@ -14,12 +14,14 @@ var Bot = function () {
         access_token_secret: process.env.access_token_secret,
         timeout_ms: 60 * 1000, // optional HTTP request timeout to apply to all requests.
     }
-    this.twit = new Twit(config);
+    this._twit = new Twit(config);
 };
 
-//
-//  post a tweet
-//
+/**
+ * Post a tweet
+ * @param {string} status 
+ * @returns {Promise}
+ */
 Bot.prototype.tweet = function (status) {
     const {callback, promise} = getPromiseCallback()
     if (typeof status !== 'string') {
@@ -27,16 +29,18 @@ Bot.prototype.tweet = function (status) {
     } else if (status.length > 280) {
         return callback(new Error('tweet is too long: ' + status.length));
     }
-    this.twit.post('statuses/update', {
+    this._twit.post('statuses/update', {
         status: status
     }, callback);
+
+    return promise;
 };
 
 // choose a random tweet and follow that user
 Bot.prototype.searchFollow = function (params, callback) {
     var self = this;
 
-    self.twit.get('search/tweets', params, function (err, reply) {
+    self._twit.get('search/tweets', params, function (err, reply) {
         if (err) return callback(err);
 
         var tweets = reply.statuses;
@@ -44,7 +48,7 @@ Bot.prototype.searchFollow = function (params, callback) {
         if (typeof rTweet != 'undefined') {
             var target = rTweet.user.id_str;
 
-            self.twit.post('friendships/create', {
+            self._twit.post('friendships/create', {
                 id: target
             }, callback);
         }
@@ -57,13 +61,13 @@ Bot.prototype.searchFollow = function (params, callback) {
 Bot.prototype.retweet = function (params, callback) {
     var self = this;
 
-    self.twit.get('search/tweets', params, function (err, reply) {
+    self._twit.get('search/tweets', params, function (err, reply) {
         if (err) return callback(err);
 
         var tweets = reply.statuses;
         var randomTweet = randIndex(tweets);
         if (typeof randomTweet != 'undefined')
-            self.twit.post('statuses/retweet/:id', {
+            self._twit.post('statuses/retweet/:id', {
                 id: randomTweet.id_str
             }, callback);
     });
@@ -75,13 +79,13 @@ Bot.prototype.retweet = function (params, callback) {
 Bot.prototype.favorite = function (params, callback) {
     var self = this;
 
-    self.twit.get('search/tweets', params, function (err, reply) {
+    self._twit.get('search/tweets', params, function (err, reply) {
         if (err) return callback(err);
 
         var tweets = reply.statuses;
         var randomTweet = randIndex(tweets);
         if (typeof randomTweet != 'undefined')
-            self.twit.post('favorites/create', {
+            self._twit.post('favorites/create', {
                 id: randomTweet.id_str
             }, callback);
     });
@@ -94,7 +98,7 @@ Bot.prototype.favorite = function (params, callback) {
 Bot.prototype.mingle = function (callback) {
     var self = this;
 
-    this.twit.get('followers/ids', function (err, reply) {
+    this._twit.get('followers/ids', function (err, reply) {
         if (err) {
             return callback(err);
         }
@@ -102,7 +106,7 @@ Bot.prototype.mingle = function (callback) {
         var followers = reply.ids,
             randFollower = randIndex(followers);
 
-        self.twit.get('friends/ids', {
+        self._twit.get('friends/ids', {
             user_id: randFollower
         }, function (err, reply) {
             if (err) {
@@ -112,7 +116,7 @@ Bot.prototype.mingle = function (callback) {
             var friends = reply.ids,
                 target = randIndex(friends);
 
-            self.twit.post('friendships/create', {
+            self._twit.post('friendships/create', {
                 id: target
             }, callback);
         })
@@ -125,12 +129,12 @@ Bot.prototype.mingle = function (callback) {
 Bot.prototype.prune = function (callback) {
     var self = this;
 
-    this.twit.get('followers/ids', function (err, reply) {
+    this._twit.get('followers/ids', function (err, reply) {
         if (err) return callback(err);
 
         var followers = reply.ids;
 
-        self.twit.get('friends/ids', function (err, reply) {
+        self._twit.get('friends/ids', function (err, reply) {
             if (err) return callback(err);
 
             var friends = reply.ids,
@@ -141,7 +145,7 @@ Bot.prototype.prune = function (callback) {
 
                 if (!~followers.indexOf(target)) {
                     pruned = true;
-                    self.twit.post('friendships/destroy', {
+                    self._twit.post('friendships/destroy', {
                         id: target
                     }, callback);
                 }
