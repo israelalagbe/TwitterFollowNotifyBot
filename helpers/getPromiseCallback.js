@@ -1,3 +1,4 @@
+const logger = require("../config/logger");
 
  function getPromiseCallback() {
     let cbs = {};
@@ -15,7 +16,6 @@
         if(err){
             return cbs.reject(err);
         }
-
         cbs.resolve(data);
     };
 

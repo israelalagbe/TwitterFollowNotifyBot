@@ -14,7 +14,7 @@ describe('Bot Test', () => {
       jest.restoreAllMocks()
     });
 
-    it('Bot.tweet() should have been valled', () => {
+    it('tweet() should have been called properly', () => {
       
       const spy = jest.spyOn(Bot._twit, 'post')
       Bot.tweet("Hello everyone")
@@ -39,5 +39,37 @@ describe('Bot Test', () => {
       expect(response).toBeInstanceOf(Promise)
       expect(await response).toBe("Response")
       
+    });
+
+    it('sendDirectMessage() should have been called properly', () => {
+      
+      const spy = jest.spyOn(Bot._twit, 'post')
+      Bot.sendDirectMessage("12345678", "Hello everyone")
+      expect(spy).toHaveBeenCalled()
+    })
+
+    it('sendDirectMessage() argument test', async () => {
+
+      const message = "Hello, world";
+      const userId = "12345678"
+      const payload = {
+        event: {
+            type: "message_create",
+            message_create: {
+                target: {
+                    recipient_id: userId
+                },
+                message_data: {
+                    text: message
+                }
+            }
+        }
+      };
+      
+
+      const spy = jest.spyOn(Bot._twit, 'post')
+      await Bot.sendDirectMessage(userId, message)
+
+      expect(spy).toHaveBeenCalledWith('direct_messages/events/new', payload, expect.anything())
     })
 });

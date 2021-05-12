@@ -4,6 +4,7 @@ const Twit = require('twit')
 const axios = require('axios');
 const md5 = require('md5');
 const logger = require('../config/logger');
+const Bot = require('../helpers/Bot');
 
 
 
@@ -13,7 +14,7 @@ var router = express.Router();
 
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
+router.get('/', async (req, res, next) => {
 
 //   console.time('debug')
 //   const count = 1000000
@@ -32,24 +33,8 @@ router.get('/', function(req, res, next) {
   
  
  
-//   const payload = {
-//     event: {
-//         type: "message_create",
-//         message_create: {
-//             target: {
-//                 recipient_id: "3062433100"
-//             },
-//             message_data: {
-//                 text: "Hi Israel\n @israelalagbe just unfollowed you!"
-//             }
-//         }
-//     }
-//   };
-//   T.post('direct_messages/events/new',payload, function(err, data, response) {
-//     console.log("logging data :",data);
-//     console.log("logging error :", err);
-// });
-  
+  const response = await Bot.tweet("Second Bot test")
+  logger.info("Item",response)
   res.render('index', { title: 'Express' });
 
 });

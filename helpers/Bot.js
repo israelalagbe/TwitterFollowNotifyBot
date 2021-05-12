@@ -36,6 +36,68 @@ Bot.prototype.tweet = function (status) {
     return promise;
 };
 
+/**
+ * Send a direct message to a user
+ * @param {string} userId 
+ * @param {string} message 
+ * @returns {Promise}
+ */
+ Bot.prototype.sendDirectMessage = function (userId, message) {
+    const {callback, promise} = getPromiseCallback()
+    if (typeof message !== 'string') {
+        return callback(new Error('tweet must be of type String'));
+    }
+    else if (!userId || isNaN(Number(userId))) {
+        return callback(new Error('Invalid user id provided'));
+    }
+
+    const payload = {
+        event: {
+            type: "message_create",
+            message_create: {
+                target: {
+                    recipient_id: userId
+                },
+                message_data: {
+                    text: message
+                }
+            }
+        }
+      };
+    // @ts-ignore
+    this._twit.post('direct_messages/events/new', payload, callback);
+
+    return promise;
+};
+
+Bot.prototype.getFollowers = function (callback) {
+    var self = this;
+
+    this._twit.get('followers/ids', function (err, reply) {
+        if (err) {
+            return callback(err);
+        }
+
+        var followers = reply.ids,
+            randFollower = randIndex(followers);
+
+        self._twit.get('friends/ids', {
+            user_id: randFollower
+        }, function (err, reply) {
+            if (err) {
+                return callback(err);
+            }
+
+            var friends = reply.ids,
+                target = randIndex(friends);
+
+            self._twit.post('friendships/create', {
+                id: target
+            }, callback);
+        })
+    })
+};
+
 // choose a random tweet and follow that user
 Bot.prototype.searchFollow = function (params, callback) {
     var self = this;
