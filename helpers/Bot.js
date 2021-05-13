@@ -4,8 +4,11 @@
 //
 const Twit = require('twit');
 const getPromiseCallback = require('./getPromiseCallback');
-const { limitFollowersCall } = require('./rate_limiters');
-
+const {
+    limitFollowersCall
+} = require('./rate_limiters');
+const request = require('request');
+const querystring = require('querystring');
 
 var Bot = function () {
     const config = {
@@ -19,12 +22,38 @@ var Bot = function () {
 };
 
 /**
+ * 
+ * @returns {Promise<{oauth_token:string, oauth_token_secret:string}>}
+ */
+Bot.prototype.requestToken = async function () {
+    return new Promise((resolve, reject) => {
+        request.get('https://api.twitter.com/oauth/request_token', {
+            timeout: 60000,
+            oauth: {
+                consumer_key: process.env.consumer_key,
+                consumer_secret: process.env.consumer_secret
+            }
+        // @ts-ignore
+        }, (err, result, body) => {
+            if(err) return reject(err);
+            const res = querystring.decode(body)
+            // @ts-ignore
+            resolve({ oauth_token: res.oauth_token,oauth_token_secret: res.oauth_token_secret })
+      
+        })
+    })
+};
+
+/**
  * Post a tweet
  * @param {string} status 
  * @returns {Promise}
  */
 Bot.prototype.tweet = function (status) {
-    const {callback, promise} = getPromiseCallback()
+    const {
+        callback,
+        promise
+    } = getPromiseCallback()
     if (typeof status !== 'string') {
         return callback(new Error('tweet must be of type String'));
     } else if (status.length > 280) {
@@ -43,12 +72,14 @@ Bot.prototype.tweet = function (status) {
  * @param {string} message 
  * @returns {Promise}
  */
- Bot.prototype.sendDirectMessage = function (userId, message) {
-    const {callback, promise} = getPromiseCallback()
+Bot.prototype.sendDirectMessage = function (userId, message) {
+    const {
+        callback,
+        promise
+    } = getPromiseCallback()
     if (typeof message !== 'string') {
         return callback(new Error('tweet must be of type String'));
-    }
-    else if (!userId || isNaN(Number(userId))) {
+    } else if (!userId || isNaN(Number(userId))) {
         return callback(new Error('Invalid user id provided'));
     }
 
@@ -64,22 +95,27 @@ Bot.prototype.tweet = function (status) {
                 }
             }
         }
-      };
+    };
     // @ts-ignore
     this._twit.post('direct_messages/events/new', payload, callback);
 
     return promise;
 };
 
+
+
 /**
  * 
  * @param {{user_id?:string}} query 
  * @returns {Promise<{ids:number[], next_cursor:number}>}
  */
-Bot.prototype.getFollowers = async function (query={}) {
+Bot.prototype.getFollowers = async function (query = {}) {
     await limitFollowersCall();
 
-    const {callback, promise} = getPromiseCallback()
+    const {
+        callback,
+        promise
+    } = getPromiseCallback()
 
     this._twit.get('followers/ids', query, callback);
 
@@ -93,6 +129,7 @@ Bot.prototype.searchFollow = function (params, callback) {
     self._twit.get('search/tweets', params, function (err, reply) {
         if (err) return callback(err);
 
+        // @ts-ignore
         var tweets = reply.statuses;
         var rTweet = randIndex(tweets)
         if (typeof rTweet != 'undefined') {
@@ -114,6 +151,7 @@ Bot.prototype.retweet = function (params, callback) {
     self._twit.get('search/tweets', params, function (err, reply) {
         if (err) return callback(err);
 
+        // @ts-ignore
         var tweets = reply.statuses;
         var randomTweet = randIndex(tweets);
         if (typeof randomTweet != 'undefined')
@@ -132,6 +170,7 @@ Bot.prototype.favorite = function (params, callback) {
     self._twit.get('search/tweets', params, function (err, reply) {
         if (err) return callback(err);
 
+        // @ts-ignore
         var tweets = reply.statuses;
         var randomTweet = randIndex(tweets);
         if (typeof randomTweet != 'undefined')
@@ -153,6 +192,7 @@ Bot.prototype.mingle = function (callback) {
             return callback(err);
         }
 
+        // @ts-ignore
         var followers = reply.ids,
             randFollower = randIndex(followers);
 
@@ -163,6 +203,7 @@ Bot.prototype.mingle = function (callback) {
                 return callback(err);
             }
 
+            // @ts-ignore
             var friends = reply.ids,
                 target = randIndex(friends);
 
@@ -182,11 +223,13 @@ Bot.prototype.prune = function (callback) {
     this._twit.get('followers/ids', function (err, reply) {
         if (err) return callback(err);
 
+        // @ts-ignore
         var followers = reply.ids;
 
         self._twit.get('friends/ids', function (err, reply) {
             if (err) return callback(err);
 
+            // @ts-ignore
             var friends = reply.ids,
                 pruned = false;
 

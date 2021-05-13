@@ -46,7 +46,7 @@ cron.schedule('* * * * * *', async () => {
         console.timeLog('cron')
     }
     catch(e) {
-        // logger.error("cron error", e)
+        logger.error("cron error", e)
         process.exit(1);
     }
     

@@ -43,7 +43,7 @@ describe('Bot Test', () => {
 
     expect(spy).toHaveBeenCalledWith('statuses/update', {
       status
-    }, expect.anything())
+    }, expect.any(Function))
   })
 
   it('Bot.tweet() should return correct value', async () => {
@@ -86,7 +86,7 @@ describe('Bot Test', () => {
     const spy = jest.spyOn(Bot._twit, 'post')
     await Bot.sendDirectMessage(userId, message)
 
-    expect(spy).toHaveBeenCalledWith('direct_messages/events/new', payload, expect.anything())
+    expect(spy).toHaveBeenCalledWith('direct_messages/events/new', payload, expect.any(Function))
   })
 
   it('Bot.sendDirectMessage() should return correct value', async () => {
@@ -101,8 +101,6 @@ describe('Bot Test', () => {
   });
 
   it('Bot.getFollowers() should return correct value', async () => {
-
-    const status = "Hello everyone";
 
     const response = Bot.getFollowers()
 

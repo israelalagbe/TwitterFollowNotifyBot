@@ -1,6 +1,26 @@
 {% extends 'layout.twig' %}
 
 {% block body %}
-  <h1>{{title}}</h1>
-  <p>Welcome to {{title}}</p>
+  <h1>[LOGO] Twitter Follow Notify Bot </h1>
+  <div>
+    <form action="/subscribe" method="POST">
+      <!-- <div>
+        <label>Name</label>
+        <input name="name" />
+      </div>
+      <div>
+        <label>Twitter Handle</label>
+        <input placeholder="@username" name="username" />
+      </div>
+      <div>
+        <label>Email</label>
+        <input name="name" placeholder='john@doe.com' />
+      </div>
+      <div>[ADD CAPTCHA HERE]</div> -->
+      <div>
+        <button>Signup with Twitter</button>
+      </div>
+
+    </form>
+  </div>
 {% endblock %}

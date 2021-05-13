@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "dev": "DEBUG=follownotifybot:* nodemon ./bin/www",
+    "dev": "DEBUG=follownotifybot:* nodemon -e js,twig ./bin/www",
     "dev:cron": "DEBUG=follownotifybot:* nodemon cron.js",
     "test": "jest --watch"
   },
@@ -21,6 +21,7 @@
     "node-cron": "^3.0.0",
     "p-ratelimit": "^1.0.1",
     "redis": "^3.1.2",
+    "request": "^2.88.2",
     "twig": "~0.10.3",
     "twit": "^2.2.11"
   },
