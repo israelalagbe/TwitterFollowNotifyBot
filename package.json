@@ -17,6 +17,7 @@
     "http-errors": "~1.6.3",
     "log4js": "^6.3.0",
     "md5": "^2.3.0",
+    "mongoose": "^5.12.9",
     "morgan": "~1.9.1",
     "node-cron": "^3.0.0",
     "p-ratelimit": "^1.0.1",

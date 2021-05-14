@@ -9,6 +9,7 @@ const {
 } = require('./rate_limiters');
 const request = require('request');
 const querystring = require('querystring');
+const { query } = require('express');
 
 var Bot = function () {
     const config = {
@@ -27,7 +28,8 @@ var Bot = function () {
  */
 Bot.prototype.requestToken = async function () {
     return new Promise((resolve, reject) => {
-        request.get('https://api.twitter.com/oauth/request_token', {
+        
+        request.post(`https://api.twitter.com/oauth/request_token?oauth_callback=${encodeURIComponent(process.env.oauth_callback)}`, {
             timeout: 60000,
             oauth: {
                 consumer_key: process.env.consumer_key,
@@ -37,11 +39,66 @@ Bot.prototype.requestToken = async function () {
         }, (err, result, body) => {
             if(err) return reject(err);
             const res = querystring.decode(body)
+            
             // @ts-ignore
             resolve({ oauth_token: res.oauth_token,oauth_token_secret: res.oauth_token_secret })
       
         })
-    })
+    });
+};
+
+/**
+ * @param {GetAccessTokenRequest} query
+ * @returns {Promise<GetAccessTokenResponse>}
+ */
+Bot.prototype.getAccessToken = async function (query) {
+    return new Promise((resolve, reject) => {
+        request.get(`https://api.twitter.com/oauth/access_token`, {
+            timeout: 60000,
+            oauth: {
+                consumer_key: process.env.consumer_key,
+                consumer_secret: process.env.consumer_secret,
+                token: query.oauth_token,
+                verifier: query.oauth_verifier
+            }
+        // @ts-ignore
+        }, (err, result, body) => {
+            if(err) return reject(err);
+            
+            const res = querystring.decode(body)
+            if(!res.user_id) {
+                return reject(res)
+            }
+            // @ts-ignore
+            resolve(res)
+      
+        })
+    });
+};
+
+/**
+ * @param {OAuthToken} query
+ * @returns {Promise<User>}
+ */
+ Bot.prototype.getUserCredentials = async function (query) {
+    return new Promise((resolve, reject) => {
+        request.get(`https://api.twitter.com/1.1/account/verify_credentials.json?include_email=true&skip_status=true&include_entities=false`, {
+            timeout: 60000,
+            oauth: {
+                consumer_key: process.env.consumer_key,
+                consumer_secret: process.env.consumer_secret,
+                token: query.oauth_token,
+                token_secret: query.oauth_token_secret
+            },
+            
+        // @ts-ignore
+        }, (err, result, body) => {
+            if(err) return reject(err);
+            const res = JSON.parse(body)
+            // @ts-ignore
+            resolve(res)
+        })
+    });
 };
 
 /**
