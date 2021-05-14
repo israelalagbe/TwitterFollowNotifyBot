@@ -16,7 +16,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
 
-mongoose.connect(process.env.mongodb_database_url).then(() => {
+mongoose.connect(process.env.mongodb_database_url, {useNewUrlParser: true, useUnifiedTopology:true}).then(() => {
   console.log("Connected to mongodb")
 }).catch((e)=>{
   logger2.error("error connecting to mongo: "+e)
