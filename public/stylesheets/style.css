@@ -1,8 +1,11 @@
+html {
+  min-height: 100%;
+}
 body {
-  padding: 50px;
+  min-height: 80vh;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
-a {
-  color: #00B7FF;
+.h-main {
+  height: 50vh;
 }
