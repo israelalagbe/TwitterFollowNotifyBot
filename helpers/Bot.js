@@ -39,7 +39,9 @@ Bot.prototype.requestToken = async function () {
         }, (err, result, body) => {
             if(err) return reject(err);
             const res = querystring.decode(body)
-            
+            if(!res.oauth_token) {
+                return reject(res)
+            }
             // @ts-ignore
             resolve({ oauth_token: res.oauth_token,oauth_token_secret: res.oauth_token_secret })
       
@@ -95,6 +97,9 @@ Bot.prototype.getAccessToken = async function (query) {
         }, (err, result, body) => {
             if(err) return reject(err);
             const res = JSON.parse(body)
+            if(!res?.id) {
+                reject(res)
+            }
             // @ts-ignore
             resolve(res)
         })
