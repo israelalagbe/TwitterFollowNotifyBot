@@ -20,6 +20,7 @@
     "morgan": "~1.9.1",
     "node-cron": "^3.0.0",
     "p-ratelimit": "^1.0.1",
+    "ratelimit.js": "^1.8.0",
     "redis": "^3.1.2",
     "request": "^2.88.2",
     "twig": "~0.10.3",

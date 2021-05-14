@@ -110,7 +110,7 @@ Bot.prototype.sendDirectMessage = function (userId, message) {
  * @returns {Promise<{ids:number[], next_cursor:number}>}
  */
 Bot.prototype.getFollowers = async function (query = {}) {
-    await limitFollowersCall();
+    // await limitFollowersCall();
 
     const {
         callback,
