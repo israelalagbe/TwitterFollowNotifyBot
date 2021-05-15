@@ -3,60 +3,46 @@
 const {
   default: axios
 } = require('axios');
+const mongoose = require('mongoose');
 var cron = require('node-cron');
 require('dotenv').config();
 const logger = require('./config/logger');
 
+
+const { analyzeFollowers } = require('./helpers/AppService');
+
 const Bot = require('./helpers/Bot');
+const pause = require('./helpers/pause');
+
 
 const {
   limitFollowersCall
 } = require("./helpers/rate_limiters");
 
+mongoose.connect(process.env.mongodb_database_url, {useNewUrlParser: true, useUnifiedTopology:true}).then(() => {
+  console.log("Connected to mongodb")
+}).catch((e)=>{
+  logger.error("Cron: error connecting to mongo: "+e)
+});
+
 
 (async () => {
   
-  try{
-    const res = await Bot.getAllFollowers({
-      user_id: '3062433100',
-      chunkSize: 100,
-      rateLimitPoint: 3,
-      auth: {
-        // consumer_key: process.env.consumer_key,
-        // consumer_secret: process.env.consumer_secret,
-        token: '1256620641706561536-4st8K8YB1DX27RWbUarwO5tFEYb21z',
-        token_secret: 'hW2syg8tjPZlEZuKOybzZNyJFunlcHybDoiCiO40QKDz0'
-      }
-    })
-    logger.info({
-      res: res
-    })
-  }
-  catch(err) {
-    logger.error("cron error", err)
+  while(true) {
+    await analyzeFollowers()
+    await pause(1000)
   }
 })();
 
 console.time('cron')
 // cron.schedule('* * * * * *', async () => {
 //   try {
-//     const res = await Bot.getFollowers({
-//       user_id: '1256620641706561536',
-//       auth: {
-//         consumer_key: process.env.consumer_key,
-//         consumer_secret: process.env.consumer_secret,
-//         token: '1256620641706561536-4st8K8YB1DX27RWbUarwO5tFEYb21z',
-//         token_secret: 'hW2syg8tjPZlEZuKOybzZNyJFunlcHybDoiCiO40QKDz0'
-//       }
-//     })
-//     logger.info({
-//       res
-//     })
+//     console.log("hehe")
 //     // await axios.get('http://localhost:8005/api/user')
 //     console.timeLog('cron')
 //   } catch (e) {
 //     // logger.error("cron error", e)
-//     process.exit(1);
+//     // process.exit(1);
 //   }
 
 
