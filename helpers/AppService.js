@@ -1,6 +1,8 @@
 const logger = require("../config/logger");
 const User = require("../models/User");
 const Bot = require("./Bot");
+const findUnFollowers = require("./findUnFollowers");
+const humanizeArray = require("./humanizeArray");
 const pause = require("./pause");
 
 /**
@@ -57,13 +59,71 @@ exports.addUserDetails = async (userAccessToken, twitterUser) => {
     await Bot.sendDirectMessage(twitterUser.id_str, `Hello ${twitterUser.name}, your subscription is successful!`)
 }
 
-exports.analyzeFollowers = async () => {
+const analyzeSubscriber = async (user) => {
+    const oldFollowers = user.followers;
+
+
+
+    const newFollowers = await Bot.getAllFollowers({
+        user_id: user.twitter_user_id,
+        chunkSize: 5000,
+        rateLimitPoint: 10,
+        auth: {
+            token: user.access_token,
+            token_secret: user.access_token_secret
+        }
+    });
+
+    const unfollowers = findUnFollowers(oldFollowers, newFollowers);
+    
+    if(unfollowers.length) {
+
+        const users = await Bot.getUsers({
+            auth: {
+                token: user.access_token,
+                token_secret: user.access_token_secret
+            },
+            ids: unfollowers
+        });
+       
+       if(users.length) {
+        const unFollowersUsernames = users.map((item) => '@'+item.username)
+
+        const message = `Hello ${user.name},\n${humanizeArray(unFollowersUsernames)} has unfollowed you!`;
+        
+        logger.info(message)
+
+        await Bot.sendDirectMessage(user.twitter_user_id, message)
+        user.followers = newFollowers;
+        await user.save();
+       }
+        
+    
+        
+    
+        
+        
+    }
+    
+}
+
+exports.analyzeSubscribersFollowers = async () => {
     const analysisStart = Date.now();
 
     const users = await User.find({});
     for (const user of users) {
         // console.log({user})
-        await pause(1000);
+        try {
+            await analyzeSubscriber(user);
+        } catch (e) {
+            logger.error("analyzeSubscriber error", {
+                error: JSON.stringify(e),
+                user: {
+                    username: user.username,
+                    name: user.name,
+                }
+            })
+        }
 
 
     }
@@ -77,6 +137,7 @@ exports.analyzeFollowers = async () => {
     logger.info("Analysis ends in: ", Math.round(runningTime / 1000) + " sec")
 
     const breakTime = 1000 * 60 * 60
+    // const breakTime = 1000 * 60
 
     if (runningTime < breakTime) {
         await pause(breakTime - runningTime)

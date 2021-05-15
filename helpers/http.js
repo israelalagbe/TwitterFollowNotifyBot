@@ -1,5 +1,6 @@
 const querystring = require('querystring');
 const request = require('request');
+const logger = require('../config/logger');
 const removeNullItem = require('./removeNullItem');
 
 /**
@@ -20,7 +21,6 @@ module.exports = (url, {
             ...removeNullItem({...params})
         });
 
-        console.log(query)
         requestMethod(`${url}${query?'?'+query: ''}`, {
             timeout: 60000,
             oauth: {
@@ -32,9 +32,7 @@ module.exports = (url, {
             // @ts-ignore
         }, (err, response, body) => {
             if (err) return reject(err);
-
             // const res = querystring.decode(body)
-
             if (response.statusCode >= 300) {
                 return reject(JSON.parse(body))
             }

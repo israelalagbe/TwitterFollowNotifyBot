@@ -9,15 +9,11 @@ require('dotenv').config();
 const logger = require('./config/logger');
 
 
-const { analyzeFollowers } = require('./helpers/AppService');
+const { analyzeSubscribersFollowers } = require('./helpers/AppService');
 
 const Bot = require('./helpers/Bot');
 const pause = require('./helpers/pause');
 
-
-const {
-  limitFollowersCall
-} = require("./helpers/rate_limiters");
 
 mongoose.connect(process.env.mongodb_database_url, {useNewUrlParser: true, useUnifiedTopology:true}).then(() => {
   console.log("Connected to mongodb")
@@ -29,8 +25,7 @@ mongoose.connect(process.env.mongodb_database_url, {useNewUrlParser: true, useUn
 (async () => {
   
   while(true) {
-    await analyzeFollowers()
-    await pause(1000)
+    await analyzeSubscribersFollowers()
   }
 })();
 

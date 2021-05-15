@@ -186,7 +186,7 @@ Bot.prototype.sendDirectMessage = function (userId, message) {
  *      count?: number
  *      auth: HttpConfigParam['oauth']
  *   }} params 
- * @returns {Promise<{ids:number[], next_cursor:number}>}
+ * @returns {Promise<{ids:string[], next_cursor_str:string}>}
  */
 Bot.prototype.getFollowers = async function (params) {
     return http(`${v1BaseUrl}/followers/ids.json`, {
@@ -197,6 +197,7 @@ Bot.prototype.getFollowers = async function (params) {
             consumer_secret: process.env.consumer_secret,
         },
         params: {
+            stringify_ids: true,
             user_id: params.user_id,
             ...(params.next_cursor ? {
                 cursor: params.next_cursor
@@ -206,6 +207,7 @@ Bot.prototype.getFollowers = async function (params) {
     });
 };
 
+
 /**
  * 
  * @param {{
@@ -214,7 +216,7 @@ Bot.prototype.getFollowers = async function (params) {
  *          auth: HttpConfigParam['oauth'],
  *          rateLimitPoint: number
  *      }} params 
- * @returns {Promise<number[]>}
+ * @returns {Promise<string[]>}
  */
 Bot.prototype.getAllFollowers = async function (params) {
     let nextCursor = null;
@@ -234,7 +236,7 @@ Bot.prototype.getAllFollowers = async function (params) {
 
         followers = [...followers, ...result.ids];
 
-        nextCursor = result.next_cursor;
+        nextCursor = result.next_cursor_str;
 
         if(callCount % params.rateLimitPoint === 0) {
             const _15minutes = 1000 * 60 * 15;
@@ -242,11 +244,33 @@ Bot.prototype.getAllFollowers = async function (params) {
             
         }
     }
-    while(nextCursor);
+    while(nextCursor && nextCursor!== '0');
 
     return followers;
     
 }
+
+/**
+ * 
+ * @param {{
+ *      ids: String[]
+ *      auth: HttpConfigParam['oauth']
+ *   }} params 
+ * @returns {Promise<{id: string, name: string, username: string}[]>}
+ */
+Bot.prototype.getUsers = async function (params) {
+    return http(`https://api.twitter.com/2/users`, {
+        method: 'get',
+        oauth: {
+            ...params.auth,
+            consumer_key: process.env.consumer_key,
+            consumer_secret: process.env.consumer_secret,
+        },
+        params: {
+            ids: params.ids.join(',')
+        }
+    }).then((result) => result.data || []);
+};
 
 /**
  * 

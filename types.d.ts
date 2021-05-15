@@ -18,7 +18,7 @@ interface OAuthToken {
 
 interface HttpConfigParam {
   method: 'get'|'post'|'put'|'patch'|'delete'
-  params?: { [key: string]: string|number };
+  params?: { [key: string]: string|number|boolean };
   body?: Object;
   oauth?: import('request').OAuthOptions;
 }

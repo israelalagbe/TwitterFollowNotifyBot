@@ -123,11 +123,11 @@ describe('Bot Test', () => {
   it('Bot.getAllFollowers() should return all followers', async () => {
    
     jest.spyOn(Bot, 'getFollowers').mockReturnValueOnce(Promise.resolve({
-      ids: [1,2,3],
-      next_cursor: 4
+      ids: ['1', '2', '3'],
+      next_cursor_str: '4'
     })).mockReturnValueOnce(Promise.resolve({
-      ids: [4, 5, 6],
-      next_cursor: null
+      ids: ['4', '5', '6'],
+      next_cursor_str: null
     }))
 
     
@@ -143,22 +143,22 @@ describe('Bot Test', () => {
     
 
     expect(response).toBeInstanceOf(Promise)
-    expect(await response).toEqual([1,2, 3, 4, 5, 6])
+    expect(await response).toEqual(['1','2', '3', '4', '5', '6'])
     expect(Bot.getFollowers).toBeCalledTimes(2)
 
   });
   it('Bot.getAllFollowers() delays when callCount', async () => {
     jest.spyOn(Bot, 'getFollowers').mockReturnValueOnce(Promise.resolve({
-      ids: [1,2,3],
-      next_cursor: 4
+      ids: ['1', '2', '3'],
+      next_cursor_str: '4'
     }))
     .mockReturnValueOnce(Promise.resolve({
-      ids: [4, 5, 6],
-      next_cursor: 4
+      ids: ['4', '5', '6'],
+      next_cursor_str: '4'
     }))
     .mockReturnValueOnce(Promise.resolve({
-      ids: [7, 8, 9],
-      next_cursor: null
+      ids: ['7', '8', '9'],
+      next_cursor_str: null
     }))
 
     
@@ -174,7 +174,7 @@ describe('Bot Test', () => {
     
 
     expect(response).toBeInstanceOf(Promise)
-    expect(await response).toEqual([1,2, 3, 4, 5, 6, 7, 8, 9])
+    expect(await response).toEqual(['1', '2', '3', '4', '5', '6', '7', '8', '9'])
     expect(Bot.getFollowers).toBeCalledTimes(3)
     const _15minutes = 1000 * 60 * 15;
     expect(pause).toBeCalledTimes(1)
