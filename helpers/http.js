@@ -1,5 +1,6 @@
 const querystring = require('querystring');
 const request = require('request');
+const removeNullItem = require('./removeNullItem');
 
 /**
  * 
@@ -16,16 +17,17 @@ module.exports = (url, {
     return new Promise((resolve, reject) => {
         const requestMethod = request[method];
         const query = querystring.stringify({
-            ...params
+            ...removeNullItem({...params})
         });
 
+        console.log(query)
         requestMethod(`${url}${query?'?'+query: ''}`, {
             timeout: 60000,
             oauth: {
                 ...oauth
             },
             ...(['post'].includes(method) ? {
-                json: body
+                form: removeNullItem({...body})
             } : null)
             // @ts-ignore
         }, (err, response, body) => {

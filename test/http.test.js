@@ -42,7 +42,7 @@ describe('HTTP Test', () => {
             oauth: {
                 token: "to"
             },
-            json: {
+            form: {
                 a: 'b'
             },
         }, expect.any(Function))

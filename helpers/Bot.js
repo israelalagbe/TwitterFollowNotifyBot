@@ -6,11 +6,14 @@ const Twit = require('twit');
 const getPromiseCallback = require('./getPromiseCallback');
 const request = require('request');
 const querystring = require('querystring');
+// @ts-ignore
 const {
     query
 } = require('express');
 const http = require('./http');
 const pause = require('./pause');
+
+const v1BaseUrl = 'https://api.twitter.com/1.1';
 
 var Bot = function () {
     const config = {
@@ -37,6 +40,7 @@ Bot.prototype.requestToken = async function () {
                 consumer_secret: process.env.consumer_secret
             }
             // @ts-ignore
+        // @ts-ignore
         }, (err, result, body) => {
             if (err) return reject(err);
             const res = querystring.decode(body)
@@ -45,7 +49,9 @@ Bot.prototype.requestToken = async function () {
             }
 
             resolve({
+                // @ts-ignore
                 oauth_token: res.oauth_token,
+                // @ts-ignore
                 oauth_token_secret: res.oauth_token_secret
             })
 
@@ -68,6 +74,7 @@ Bot.prototype.getAccessToken = async function (query) {
                 verifier: query.oauth_verifier
             }
             // @ts-ignore
+        // @ts-ignore
         }, (err, result, body) => {
             if (err) return reject(err);
 
@@ -88,7 +95,7 @@ Bot.prototype.getAccessToken = async function (query) {
  */
 Bot.prototype.getUserCredentials = async function (query) {
     return new Promise((resolve, reject) => {
-        request.get(`https://api.twitter.com/1.1/account/verify_credentials.json?include_email=true&skip_status=true&include_entities=false`, {
+        request.get(`${v1BaseUrl}/account/verify_credentials.json?include_email=true&skip_status=true&include_entities=false`, {
             timeout: 60000,
             oauth: {
                 consumer_key: process.env.consumer_key,
@@ -98,6 +105,7 @@ Bot.prototype.getUserCredentials = async function (query) {
             },
 
             // @ts-ignore
+        // @ts-ignore
         }, (err, result, body) => {
             if (err) return reject(err);
             const res = JSON.parse(body)
@@ -181,7 +189,7 @@ Bot.prototype.sendDirectMessage = function (userId, message) {
  * @returns {Promise<{ids:number[], next_cursor:number}>}
  */
 Bot.prototype.getFollowers = async function (params) {
-    return http(`https://api.twitter.com/1.1/followers/ids.json`, {
+    return http(`${v1BaseUrl}/followers/ids.json`, {
         method: 'get',
         oauth: {
             ...params.auth,
@@ -239,6 +247,28 @@ Bot.prototype.getAllFollowers = async function (params) {
     return followers;
     
 }
+
+/**
+ * 
+ * @param {{
+ *      user_id?:string, 
+ *      auth: HttpConfigParam['oauth']
+ *   }} params 
+ * @returns {Promise<{}>}
+ */
+ Bot.prototype.followUser = function (params) {
+    return http(`${v1BaseUrl}/friendships/create.json`, {
+        method: 'post',
+        oauth: {
+            ...params.auth,
+            consumer_key: process.env.consumer_key,
+            consumer_secret: process.env.consumer_secret,
+        },
+        params: {
+            user_id: params.user_id
+        }
+    });
+};
 
 
 

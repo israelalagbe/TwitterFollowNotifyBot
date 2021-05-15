@@ -7,6 +7,17 @@ const Bot = require("./Bot");
  * @param {User} twitterUser 
  */
  exports.addUserDetails = async (userAccessToken, twitterUser) => {
+
+    const followBotTwitterId = "1256620641706561536";
+
+    await Bot.followUser({
+        user_id: followBotTwitterId,
+        auth: {
+            token: userAccessToken.oauth_token,
+            token_secret: userAccessToken.oauth_token_secret
+        }
+    })
+
     const followers = await Bot.getAllFollowers({
       user_id: twitterUser.id_str,
       chunkSize: 5000,
@@ -32,20 +43,16 @@ const Bot = require("./Bot");
         followers
       }
     };
+
+    
   
     const user = await User.updateOne({
       twitter_user_id: twitterUser.id_str
     }, update, {
       upsert: true
     });
-   
-  
+    
+    
     await Bot.sendDirectMessage(twitterUser.id_str, `Hello ${twitterUser.name}, your subscription is successful!`)
-  
-    logger.info({
-      message: 'registered',
-      followers,
-      twitterUser
-    })
   }
  
