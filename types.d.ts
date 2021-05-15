@@ -18,8 +18,8 @@ interface OAuthToken {
 
 interface HttpConfigParam {
   method: 'get'|'post'|'put'|'patch'|'delete'
-  params?: { [key: string]: string };
-  body?: { [key: string]: string };
+  params?: { [key: string]: string|number };
+  body?: Object;
   oauth?: import('request').OAuthOptions;
 }
 

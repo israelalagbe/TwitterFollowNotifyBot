@@ -10,6 +10,7 @@ const {
     query
 } = require('express');
 const http = require('./http');
+const pause = require('./pause');
 
 var Bot = function () {
     const config = {
@@ -171,7 +172,12 @@ Bot.prototype.sendDirectMessage = function (userId, message) {
 
 /**
  * 
- * @param {{next_cursor?:string, user_id?:string, auth: HttpConfigParam['oauth']}} params 
+ * @param {{
+ *      next_cursor?:string,
+ *      user_id?:string, 
+ *      count?: number
+ *      auth: HttpConfigParam['oauth']
+ *   }} params 
  * @returns {Promise<{ids:number[], next_cursor:number}>}
  */
 Bot.prototype.getFollowers = async function (params) {
@@ -184,10 +190,54 @@ Bot.prototype.getFollowers = async function (params) {
         },
         params: {
             user_id: params.user_id,
-            next_cursor: params.next_cursor
+            next_cursor: params.next_cursor,
+            count: params.count,
         }
     });
 };
+
+/**
+ * 
+ * @param {{
+ *          user_id?:string, 
+ *          chunkSize: number,
+ *          auth: HttpConfigParam['oauth'],
+ *          rateLimitPoint: number
+ *      }} params 
+ * @returns {Promise<number[]>}
+ */
+Bot.prototype.getAllFollowers = async function (params) {
+    let nextCursor = null;
+    let followers = []
+    //Pause after 10 calls
+ 
+    let callCount = 0;
+    do {
+        callCount++;
+
+        const result = await this.getFollowers({
+            auth: params.auth,
+            user_id: params.user_id,
+            count: params.chunkSize,
+            next_cursor: nextCursor,
+        });
+
+        followers = [...followers, ...result.ids];
+
+        nextCursor = result.next_cursor;
+
+        if(callCount % params.rateLimitPoint === 0) {
+            const _15minutes = 1000 * 60 * 15;
+            await pause(_15minutes)
+        }
+    }
+    while(nextCursor);
+
+    return followers;
+    
+}
+
+
 
 // choose a random tweet and follow that user
 Bot.prototype.searchFollow = function (params, callback) {
