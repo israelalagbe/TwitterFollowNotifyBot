@@ -4,9 +4,6 @@
 //
 const Twit = require('twit');
 const getPromiseCallback = require('./getPromiseCallback');
-const {
-    limitFollowersCall
-} = require('./rate_limiters');
 const request = require('request');
 const querystring = require('querystring');
 const { query } = require('express');
@@ -97,7 +94,7 @@ Bot.prototype.getAccessToken = async function (query) {
         }, (err, result, body) => {
             if(err) return reject(err);
             const res = JSON.parse(body)
-            if(!res?.id) {
+            if(!(res && res.id)) {
                 reject(res)
             }
             // @ts-ignore
