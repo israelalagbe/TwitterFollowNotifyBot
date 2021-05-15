@@ -190,7 +190,9 @@ Bot.prototype.getFollowers = async function (params) {
         },
         params: {
             user_id: params.user_id,
-            next_cursor: params.next_cursor,
+            ...(params.next_cursor ? {
+                cursor: params.next_cursor
+            } : null),
             count: params.count,
         }
     });
@@ -229,6 +231,7 @@ Bot.prototype.getAllFollowers = async function (params) {
         if(callCount % params.rateLimitPoint === 0) {
             const _15minutes = 1000 * 60 * 15;
             await pause(_15minutes)
+            
         }
     }
     while(nextCursor);

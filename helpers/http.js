@@ -29,7 +29,6 @@ module.exports = (url, {
             } : null)
             // @ts-ignore
         }, (err, response, body) => {
-            console.log(err, body, response.statusCode, JSON.stringify(response.headers))
             if (err) return reject(err);
 
             // const res = querystring.decode(body)

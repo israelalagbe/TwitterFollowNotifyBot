@@ -6,6 +6,7 @@ const md5 = require('md5');
 const logger = require('../config/logger');
 const Bot = require('../helpers/Bot');
 const User = require('../models/User');
+const {addUserDetails} = require('../helpers/AppService');
 
 
 
@@ -70,6 +71,7 @@ router.post('/subscribe', async (req, res, next) => {
   }
 });
 
+
 router.get('/success', async (req, res, next) => {
   /**
    * @type {any}
@@ -79,43 +81,9 @@ router.get('/success', async (req, res, next) => {
   try {
     const userAccessToken = await Bot.getAccessToken(query)
     const twitterUser = await Bot.getUserCredentials(userAccessToken)
-    const followers = await Bot.getFollowers({
-      user_id: twitterUser.id_str
-    });
-
-    if(twitterUser.id_str === '1256620641706561536') {
-      res.status(400).send("<h1>You cannot subscribe yourself<h1/>");
-    }
-
-    const update = {
-      $set: {
-        name: twitterUser.name,
-        username: twitterUser.screen_name,
-        access_token: userAccessToken.oauth_token,
-        access_token_secret: userAccessToken.oauth_token_secret,
-        followers_count: twitterUser.followers_count,
-        following_count: twitterUser.friends_count,
-        email: twitterUser.email,
-        twitter_user_id: twitterUser.id_str,
-        followers: followers.ids
-      }
-    };
-
-    const user = await User.updateOne({
-      twitter_user_id: twitterUser.id_str
-    }, update, {
-      upsert: true
-    });
-   
-
-    await Bot.sendDirectMessage(twitterUser.id_str, `Hello ${twitterUser.name},\n Your subscription is successful!`)
-
-    console.log({
-      followers,
-      twitterUser
-    })
-    res.send("done")
-    // res.redirect(`https://api.twitter.com/oauth/authorize?oauth_token=${result.oauth_token}`);
+    addUserDetails(userAccessToken, twitterUser)
+    res.send("<h1>Congratulations, you have successfully subscribed</h1>")
+    
   } catch (e) {
     logger.error(e)
     res.status(400).send("<h1>Opps, Something went went<h1/>");

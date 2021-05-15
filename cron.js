@@ -6,12 +6,7 @@ const {
 var cron = require('node-cron');
 require('dotenv').config();
 const logger = require('./config/logger');
-console.log({
-  consumer_key: process.env.consumer_key,
-  consumer_secret: process.env.consumer_secret,
-  token: '1256620641706561536-4st8K8YB1DX27RWbUarwO5tFEYb21z',
-  token_secret: 'hW2syg8tjPZlEZuKOybzZNyJFunlcHybDoiCiO40QKDz0'
-})
+
 const Bot = require('./helpers/Bot');
 
 const {
@@ -22,8 +17,10 @@ const {
 (async () => {
   
   try{
-    const res = await Bot.getFollowers({
+    const res = await Bot.getAllFollowers({
       user_id: '3062433100',
+      chunkSize: 100,
+      rateLimitPoint: 3,
       auth: {
         // consumer_key: process.env.consumer_key,
         // consumer_secret: process.env.consumer_secret,
