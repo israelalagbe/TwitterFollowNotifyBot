@@ -6,7 +6,10 @@ const Twit = require('twit');
 const getPromiseCallback = require('./getPromiseCallback');
 const request = require('request');
 const querystring = require('querystring');
-const { query } = require('express');
+const {
+    query
+} = require('express');
+const http = require('./http');
 
 var Bot = function () {
     const config = {
@@ -25,23 +28,26 @@ var Bot = function () {
  */
 Bot.prototype.requestToken = async function () {
     return new Promise((resolve, reject) => {
-        
+
         request.post(`https://api.twitter.com/oauth/request_token?oauth_callback=${encodeURIComponent(process.env.oauth_callback)}`, {
             timeout: 60000,
             oauth: {
                 consumer_key: process.env.consumer_key,
                 consumer_secret: process.env.consumer_secret
             }
-        // @ts-ignore
+            // @ts-ignore
         }, (err, result, body) => {
-            if(err) return reject(err);
+            if (err) return reject(err);
             const res = querystring.decode(body)
-            if(!res.oauth_token) {
+            if (!res.oauth_token) {
                 return reject(res)
             }
-            // @ts-ignore
-            resolve({ oauth_token: res.oauth_token,oauth_token_secret: res.oauth_token_secret })
-      
+
+            resolve({
+                oauth_token: res.oauth_token,
+                oauth_token_secret: res.oauth_token_secret
+            })
+
         })
     });
 };
@@ -60,17 +66,17 @@ Bot.prototype.getAccessToken = async function (query) {
                 token: query.oauth_token,
                 verifier: query.oauth_verifier
             }
-        // @ts-ignore
+            // @ts-ignore
         }, (err, result, body) => {
-            if(err) return reject(err);
-            
+            if (err) return reject(err);
+
             const res = querystring.decode(body)
-            if(!res.user_id) {
+            if (!res.user_id) {
                 return reject(res)
             }
             // @ts-ignore
             resolve(res)
-      
+
         })
     });
 };
@@ -79,7 +85,7 @@ Bot.prototype.getAccessToken = async function (query) {
  * @param {OAuthToken} query
  * @returns {Promise<User>}
  */
- Bot.prototype.getUserCredentials = async function (query) {
+Bot.prototype.getUserCredentials = async function (query) {
     return new Promise((resolve, reject) => {
         request.get(`https://api.twitter.com/1.1/account/verify_credentials.json?include_email=true&skip_status=true&include_entities=false`, {
             timeout: 60000,
@@ -89,12 +95,12 @@ Bot.prototype.getAccessToken = async function (query) {
                 token: query.oauth_token,
                 token_secret: query.oauth_token_secret
             },
-            
-        // @ts-ignore
+
+            // @ts-ignore
         }, (err, result, body) => {
-            if(err) return reject(err);
+            if (err) return reject(err);
             const res = JSON.parse(body)
-            if(!(res && res.id)) {
+            if (!(res && res.id)) {
                 reject(res)
             }
             // @ts-ignore
@@ -165,20 +171,22 @@ Bot.prototype.sendDirectMessage = function (userId, message) {
 
 /**
  * 
- * @param {{user_id?:string}} query 
+ * @param {{next_cursor?:string, user_id?:string, auth: HttpConfigParam['oauth']}} params 
  * @returns {Promise<{ids:number[], next_cursor:number}>}
  */
-Bot.prototype.getFollowers = async function (query = {}) {
-    // await limitFollowersCall();
-
-    const {
-        callback,
-        promise
-    } = getPromiseCallback()
-
-    this._twit.get('followers/ids', query, callback);
-
-    return promise;
+Bot.prototype.getFollowers = async function (params) {
+    return http(`https://api.twitter.com/1.1/followers/ids.json`, {
+        method: 'get',
+        oauth: {
+            ...params.auth,
+            consumer_key: process.env.consumer_key,
+            consumer_secret: process.env.consumer_secret,
+        },
+        params: {
+            user_id: params.user_id,
+            next_cursor: params.next_cursor
+        }
+    });
 };
 
 // choose a random tweet and follow that user

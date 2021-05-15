@@ -24,7 +24,7 @@ describe('HTTP Test', () => {
             }, `{"status":"success"}`)
         })
         // request.post
-        const response = await http('google.com', {
+        const response = await http('https://google.com', {
             method: 'post',
             params: {
                 hello: 'world'
@@ -37,15 +37,14 @@ describe('HTTP Test', () => {
             }
         });
 
-        expect(request.post).toHaveBeenCalledWith('google.com?hello=world', {
+        expect(request.post).toHaveBeenCalledWith('https://google.com?hello=world', {
             timeout: 60000,
             oauth: {
                 token: "to"
             },
-            json: true,
-            body: {
+            json: {
                 a: 'b'
-            }
+            },
         }, expect.any(Function))
         expect(response).toEqual({status:'success'})
 

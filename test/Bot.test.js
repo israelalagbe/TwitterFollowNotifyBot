@@ -1,7 +1,7 @@
 const Twit = require('twit');
 const Bot = require('../helpers/Bot');
 const getPromiseCallback = require('../helpers/getPromiseCallback');
-
+const http = require('../helpers/http');
 
 jest.mock('twit', () => class {
   post(_, __, callback) {
@@ -19,6 +19,9 @@ jest.mock('../helpers/rate_limiters', () => ({
   }
 
 }))
+
+jest.mock('../helpers/http');
+
 
 
 describe('Bot Test', () => {
@@ -101,8 +104,14 @@ describe('Bot Test', () => {
   });
 
   it('Bot.getFollowers() should return correct value', async () => {
+    // @ts-ignore
+    http.mockImplementation(() => Promise.resolve("Response"));
 
-    const response = Bot.getFollowers()
+    
+    const response = Bot.getFollowers({
+      user_id: "1234",
+      auth:{}
+    })
 
     expect(response).toBeInstanceOf(Promise)
     expect(await response).toBe("Response")

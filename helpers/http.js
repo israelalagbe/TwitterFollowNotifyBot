@@ -24,19 +24,18 @@ module.exports = (url, {
             oauth: {
                 ...oauth
             },
-            body: {
-                ...body
-            },
-            json: true
+            ...(['post'].includes(method) ? {
+                json: body
+            } : null)
             // @ts-ignore
         }, (err, response, body) => {
-
+            console.log(err, body, response.statusCode, JSON.stringify(response.headers))
             if (err) return reject(err);
 
             // const res = querystring.decode(body)
 
             if (response.statusCode >= 300) {
-                return reject(body)
+                return reject(JSON.parse(body))
             }
             // @ts-ignore
             resolve(JSON.parse(body))
