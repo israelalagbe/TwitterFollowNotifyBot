@@ -1,4 +1,4 @@
-const findUnFollowers = require("../helpers/findUnFollowers");
+const findUnFollowers = require("../helpers/findUnfollowers");
 
 describe('find unfollowers', () => {
     it('should return unfollowers', () => {
