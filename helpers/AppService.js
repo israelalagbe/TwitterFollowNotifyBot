@@ -1,7 +1,7 @@
 const logger = require("../config/logger");
 const User = require("../models/user");
 const Bot = require("./Bot");
-const findUnFollowers = require("./findUnFollowers");
+const findUnfollowers = require("./findUnfollowers");
 const humanizeArray = require("./humanizeArray");
 const pause = require("./pause");
 
@@ -74,7 +74,7 @@ const analyzeSubscriber = async (user) => {
         }
     });
 
-    const unfollowers = findUnFollowers(oldFollowers, newFollowers);
+    const unfollowers = findUnfollowers(oldFollowers, newFollowers);
     
     if(unfollowers.length) {
 
