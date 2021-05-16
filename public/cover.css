@@ -96,6 +96,10 @@ body {
 
 .logo {
   width: 5rem;
+  border-radius: 50%;
+}
+.screenshot{
+  border-radius: 10px;
 }
 
 @media (min-width: 48em) {
@@ -121,7 +125,7 @@ body {
 }
 
 .heading-text {
-  font-weight: 200;
+  font-weight: 100;
 }
 
 .cover-heading {
