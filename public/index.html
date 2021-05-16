@@ -1,42 +1,61 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="stylesheets/style.css">
-  <title>Twitter Follow Notify Bot</title>
-</head>
-<body class="w-10/12 m-auto my-20 border-2 border-black">
-  <nav class="flex justify-between items-center py-4 px-6">
-    <section class="flex items-center">
-      <img src="logo.gif" alt="logo" class="w-16">
-      <p class="pl-5 font-semibold">Follow Notify Bot</p>
-    </section>
-    <section class="">
-      <a href="#">Privacy Policy</a>
-      <a href="#" class="pl-10">Terms and condition</a>
-    </section>
-  </nav>
-  <main class="md:w-5/12 mx-auto flex flex-col justify-center h-main text-lg">
-    <section>
-      <p class="text-center lead"><span class="font-semibold">@FollowNotifyBot</span> helps monitor your followers and following and alerts you when someone unfollows or follows you</p>
-      <img src="botScreenshot.jpg" alt="Notify bot Screenshot">
-      <h3 class="my-4 text-xl">Connect your twitter account now to get started</h3>
-      <ul class="list-disc">
-        <li>We won't post anything on your twitter</li>
-        <li>Your account information is 100% confidential</li>
-      </ul>
-      <div class="text-center mt-12">
-        <a class="p-5 border rounded-2xl font-semibold" href="#" target="_blank" rel="noopener noreferrer">Signup with Twitter</a>
-      </div>
-    </section>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="favicon.ico">
 
-    <!-- <section class="text-3xl text-center">
-      <p class="font-semibold mb-5">Congratulations, your account has been sucessfully connected.</p>
-      <p class="font-light">@FollowNotifyBot now runs hourly check on your account</p>
-    </section> -->
-  </main>
-</body>
+    <title>Twitter Follow Notify Bot</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="cover.css" rel="stylesheet">
+  </head>
+
+  <body class="text-center">
+
+    <div class="cover-container d-flex h-100 p-3 mx-auto flex-column">
+      <header class="masthead mb-auto">
+        <div class="inner">
+          <h3 class="masthead-brand"><img src="logo.gif" alt="logo" class="logo"></h3>
+          <nav class="nav nav-masthead justify-content-center">
+            <a class="nav-link active" href="index.html">Home</a>
+            <a class="nav-link" href="privacy-policy.html">Privacy Policy</a>
+            <a class="nav-link" href="tnc.html">Terms and condition</a>
+          </nav>
+        </div>
+      </header>
+
+      <main role="main" class="inner cover">
+        <h1 class="heading-text"><span class="cover-heading">@FollowNotifyBot</span> helps monitor your followers and following and alerts you when someone unfollows or follows you</h1>
+        <img src="botScreenshot.jpg" alt="Notify bot Screenshot" width="400">
+        <h3 class="my-4 text-xl">Connect your twitter account now to get started</h3>
+        <ul class="list-disc">
+          <li>We won't post anything on your twitter</li>
+          <li>Your account information is 100% confidential</li>
+        </ul>
+        <p class="lead">
+          <a href="#" class="btn btn-lg btn-secondary">Signup with twitter</a>
+        </p>
+      </main>
+
+      <footer class="mastfoot mt-auto">
+        <div class="inner">
+          <p>@FollowNotifyBot was built by <a href="https://twitter.com/">Israel</a></p>
+        </div>
+      </footer>
+    </div>
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script>window.jQuery || document.write('<script src="assets/js/vendor/jquery-slim.min.js"><\/script>')</script>
+    <script src="assets/js/vendor/popper.min.js"></script>
+    <script src="dist/js/bootstrap.min.js"></script> -->
+  </body>
 </html>
