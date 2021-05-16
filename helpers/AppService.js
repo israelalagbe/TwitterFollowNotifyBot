@@ -1,5 +1,5 @@
 const logger = require("../config/logger");
-const User = require("../models/User");
+const User = require("../models/user");
 const Bot = require("./Bot");
 const findUnFollowers = require("./findUnFollowers");
 const humanizeArray = require("./humanizeArray");

@@ -5,7 +5,7 @@ const axios = require('axios').default;
 const md5 = require('md5');
 const logger = require('../config/logger');
 const Bot = require('../helpers/Bot');
-const User = require('../models/User');
+const User = require('../models/user');
 const {addUserDetails} = require('../helpers/AppService');
 
 
