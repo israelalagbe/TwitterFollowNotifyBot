@@ -64,10 +64,9 @@ router.post('/subscribe', async (req, res, next) => {
     const result = await Bot.requestToken()
     res.redirect(`https://api.twitter.com/oauth/authorize?oauth_token=${result.oauth_token}`);
   } catch (e) {
-    res.status(400).json({
-      e
-    });
     logger.error(e)
+    res.status(400).send("<h1>Opps, Something went went<h1/>");
+    
   }
 });
 

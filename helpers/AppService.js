@@ -56,7 +56,7 @@ exports.addUserDetails = async (userAccessToken, twitterUser) => {
     });
 
 
-    await Bot.sendDirectMessage(twitterUser.id_str, `Hello ${twitterUser.name}, your subscription is successful!`)
+    await Bot.sendDirectMessage(twitterUser.id_str, `Hello ${twitterUser.name}, your subscription was successful!`)
 }
 
 const analyzeSubscriber = async (user) => {
@@ -136,8 +136,8 @@ exports.analyzeSubscribersFollowers = async () => {
 
     logger.info("Analysis ends in: ", Math.round(runningTime / 1000) + " sec")
 
-    const breakTime = 1000 * 60 * 60
-    // const breakTime = 1000 * 60
+    // const breakTime = 1000 * 60 * 60
+    const breakTime = 1000 * 60
 
     if (runningTime < breakTime) {
         await pause(breakTime - runningTime)
