@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "jest && npm run start:server",
-    "start:server": "pm2 restart ecosystem.config.js",
+    "start:server": "pm2 reload ecosystem.config.js",
     "dev": "DEBUG=follownotifybot:* nodemon -e js,twig ./bin/www",
     "dev:cron": "DEBUG=follownotifybot:* nodemon cron.js",
     "test": "jest --watch"
