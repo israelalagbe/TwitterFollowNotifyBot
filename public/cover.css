@@ -100,6 +100,7 @@ body {
 }
 .screenshot{
   border-radius: 10px;
+  margin-top: 1rem;
 }
 
 @media (min-width: 48em) {
@@ -140,4 +141,19 @@ body {
  */
 .mastfoot {
   color: rgba(0, 0, 0, .5);
+}
+
+@media only screen and (max-width: 768px) {
+  .heading-text{
+    margin-top: 1rem;
+    font-size: 1.5rem;
+    
+  }
+  .screenshot{
+    width: 100%;
+    
+  }
+  h3{
+    font-size: 1.2rem;
+  }
 }
