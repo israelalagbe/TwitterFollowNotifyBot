@@ -1,6 +1,8 @@
 const Twit = require('twit');
 const Bot = require('../helpers/Bot');
 const getPromiseCallback = require('../helpers/getPromiseCallback');
+const http = require('../helpers/http');
+const pause = require('../helpers/pause');
 
 
 jest.mock('twit', () => class {
@@ -19,6 +21,10 @@ jest.mock('../helpers/rate_limiters', () => ({
   }
 
 }))
+
+jest.mock('../helpers/http');
+jest.mock('../helpers/pause');
+
 
 
 describe('Bot Test', () => {
@@ -101,11 +107,78 @@ describe('Bot Test', () => {
   });
 
   it('Bot.getFollowers() should return correct value', async () => {
+    // @ts-ignore
+    http.mockImplementation(() => Promise.resolve("Response"));
 
-    const response = Bot.getFollowers()
+    
+    const response = Bot.getFollowers({
+      user_id: "1234",
+      auth:{}
+    })
 
     expect(response).toBeInstanceOf(Promise)
     expect(await response).toBe("Response")
+
+  });
+  it('Bot.getAllFollowers() should return all followers', async () => {
+   
+    jest.spyOn(Bot, 'getFollowers').mockReturnValueOnce(Promise.resolve({
+      ids: ['1', '2', '3'],
+      next_cursor_str: '4'
+    })).mockReturnValueOnce(Promise.resolve({
+      ids: ['4', '5', '6'],
+      next_cursor_str: null
+    }))
+
+    
+    const response = Bot.getAllFollowers({
+      user_id: "1234",
+      rateLimitPoint: 10,
+      auth:{
+
+      }, 
+      chunkSize: 4
+    })
+
+    
+
+    expect(response).toBeInstanceOf(Promise)
+    expect(await response).toEqual(['1','2', '3', '4', '5', '6'])
+    expect(Bot.getFollowers).toBeCalledTimes(2)
+
+  });
+  it('Bot.getAllFollowers() delays when callCount', async () => {
+    jest.spyOn(Bot, 'getFollowers').mockReturnValueOnce(Promise.resolve({
+      ids: ['1', '2', '3'],
+      next_cursor_str: '4'
+    }))
+    .mockReturnValueOnce(Promise.resolve({
+      ids: ['4', '5', '6'],
+      next_cursor_str: '4'
+    }))
+    .mockReturnValueOnce(Promise.resolve({
+      ids: ['7', '8', '9'],
+      next_cursor_str: null
+    }))
+
+    
+    const response = Bot.getAllFollowers({
+      user_id: "1234",
+      auth:{
+
+      }, 
+      rateLimitPoint: 2,
+      chunkSize: 4
+    })
+
+    
+
+    expect(response).toBeInstanceOf(Promise)
+    expect(await response).toEqual(['1', '2', '3', '4', '5', '6', '7', '8', '9'])
+    expect(Bot.getFollowers).toBeCalledTimes(3)
+    const _15minutes = 1000 * 60 * 15;
+    expect(pause).toBeCalledTimes(1)
+    expect(pause).toBeCalledWith(_15minutes)
 
   });
 });

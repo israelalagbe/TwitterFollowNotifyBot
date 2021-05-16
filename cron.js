@@ -1,58 +1,47 @@
 // const { pRateLimit, RedisQuotaManager } = require('p-ratelimit');
 
-const { default: axios } = require('axios');
+const {
+  default: axios
+} = require('axios');
+const mongoose = require('mongoose');
 var cron = require('node-cron');
+require('dotenv').config();
 const logger = require('./config/logger');
 
-const { limitFollowersCall } = require("./helpers/rate_limiters");
 
-// const redis = require("redis");
-// const client = redis.createClient();
+const { analyzeSubscribersFollowers } = require('./helpers/AppService');
+
+const Bot = require('./helpers/Bot');
+const pause = require('./helpers/pause');
 
 
-// const quota = {
-//     fastStart: false,
-//     interval: 30000,             // 1000 ms == 1 second
-//     rate: 1,                   // 30 API calls per interval
-//     concurrency: 1,            // no more than 10 running at once
-//     maxDelay: 3000000              // an API call delayed > 2 sec is rejected
-// };
+mongoose.connect(process.env.mongodb_database_url, {useNewUrlParser: true, useUnifiedTopology:true}).then(() => {
+  console.log("Connected to mongodb")
+}).catch((e)=>{
+  logger.error("Cron: error connecting to mongo: "+e)
+});
 
-// const channelName = 'twitter-api';
-// // Create a RedisQuotaManager
-// const qm = new RedisQuotaManager(
-//     quota,
-//     channelName,
-//     client
-// );
 
-// const limit = pRateLimit(qm);
+(async () => {
+  
+  while(true) {
+    await analyzeSubscribersFollowers()
+  }
+})();
 
-// console.time("rate");
-
-// (async () => {
-//     console.timeLog('rate')
-//    for (let index = 0; index < 10; index++) {
-//     await limitFollowersCall()
-//     console.timeLog('rate')
-//    }
-// })();
 console.time('cron')
-cron.schedule('* * * * * *', async () => {
-    
-    try{
-        await limitFollowersCall()
-        await axios.get('http://localhost:8005/api/user')
-        console.timeLog('cron')
-    }
-    catch(e) {
-        logger.error("cron error", e)
-        process.exit(1);
-    }
-    
-    
-  }, {
-    scheduled: true,
-    timezone: "Africa/Lagos"
-  });
- 
+// cron.schedule('* * * * * *', async () => {
+//   try {
+//     console.log("hehe")
+//     // await axios.get('http://localhost:8005/api/user')
+//     console.timeLog('cron')
+//   } catch (e) {
+//     // logger.error("cron error", e)
+//     // process.exit(1);
+//   }
+
+
+// }, {
+//   scheduled: true,
+//   timezone: "Africa/Lagos"
+// });

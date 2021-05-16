@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www",
+    "start": "jest && npm run start:server",
+    "start:server": "pm2 reload ecosystem.config.js",
     "dev": "DEBUG=follownotifybot:* nodemon -e js,twig ./bin/www",
     "dev:cron": "DEBUG=follownotifybot:* nodemon cron.js",
     "test": "jest --watch"
@@ -17,9 +18,11 @@
     "http-errors": "~1.6.3",
     "log4js": "^6.3.0",
     "md5": "^2.3.0",
+    "mongoose": "^5.12.9",
     "morgan": "~1.9.1",
     "node-cron": "^3.0.0",
     "p-ratelimit": "^1.0.1",
+    "ratelimit.js": "^1.8.0",
     "redis": "^3.1.2",
     "request": "^2.88.2",
     "twig": "~0.10.3",

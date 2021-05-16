@@ -3,8 +3,12 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const mongoose = require("mongoose");
+
 require('dotenv').config();
 
+
+var cron = require('node-cron');
 
 const logger2 = require('./config/logger')
 
@@ -12,7 +16,11 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
 
-
+mongoose.connect(process.env.mongodb_database_url, {useNewUrlParser: true, useUnifiedTopology:true}).then(() => {
+  console.log("Connected to mongodb")
+}).catch((e)=>{
+  logger2.error("error connecting to mongo: "+e)
+});
 var app = express();
 
 // view engine setup

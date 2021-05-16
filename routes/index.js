@@ -5,6 +5,8 @@ const axios = require('axios').default;
 const md5 = require('md5');
 const logger = require('../config/logger');
 const Bot = require('../helpers/Bot');
+const User = require('../models/user');
+const {addUserDetails} = require('../helpers/AppService');
 
 
 
@@ -48,9 +50,11 @@ router.get('/', async (req, res, next) => {
   // }
   //   const twit = new Twit(config);
   //   twit.get('https://api.twitter.com/oauth/request_token',(err, response) => {logger.info("Here", err, response)})
-
-  
-  
+  // await User.create({
+  //   username: 'israelalagbe'
+  // })
+  // const user = await User.findOne()
+  // console.log({user})
   res.render('index');
 });
 
@@ -60,10 +64,29 @@ router.post('/subscribe', async (req, res, next) => {
     const result = await Bot.requestToken()
     res.redirect(`https://api.twitter.com/oauth/authorize?oauth_token=${result.oauth_token}`);
   } catch (e) {
-    res.status(400).json({
-      e
-    });
     logger.error(e)
+    res.status(400).send("<h1>Opps, Something went went<h1/>");
+    
+  }
+});
+
+
+router.get('/success', async (req, res, next) => {
+  /**
+   * @type {any}
+   */
+  const query = req.query;
+
+  try {
+    const userAccessToken = await Bot.getAccessToken(query)
+    const twitterUser = await Bot.getUserCredentials(userAccessToken)
+    addUserDetails(userAccessToken, twitterUser)
+    res.send("<h1>Congratulations, you have successfully subscribed</h1>")
+    
+  } catch (e) {
+    logger.error(e)
+    res.status(400).send("<h1>Opps, Something went went<h1/>");
+
   }
 });
 module.exports = router;

@@ -4,11 +4,16 @@
 //
 const Twit = require('twit');
 const getPromiseCallback = require('./getPromiseCallback');
-const {
-    limitFollowersCall
-} = require('./rate_limiters');
 const request = require('request');
 const querystring = require('querystring');
+// @ts-ignore
+const {
+    query
+} = require('express');
+const http = require('./http');
+const pause = require('./pause');
+
+const v1BaseUrl = 'https://api.twitter.com/1.1';
 
 var Bot = function () {
     const config = {
@@ -27,21 +32,90 @@ var Bot = function () {
  */
 Bot.prototype.requestToken = async function () {
     return new Promise((resolve, reject) => {
-        request.get('https://api.twitter.com/oauth/request_token', {
+
+        request.post(`https://api.twitter.com/oauth/request_token?oauth_callback=${encodeURIComponent(process.env.oauth_callback)}`, {
             timeout: 60000,
             oauth: {
                 consumer_key: process.env.consumer_key,
                 consumer_secret: process.env.consumer_secret
             }
+            // @ts-ignore
         // @ts-ignore
         }, (err, result, body) => {
-            if(err) return reject(err);
+            if (err) return reject(err);
             const res = querystring.decode(body)
-            // @ts-ignore
-            resolve({ oauth_token: res.oauth_token,oauth_token_secret: res.oauth_token_secret })
-      
+            if (!res.oauth_token) {
+                return reject(res)
+            }
+
+            resolve({
+                // @ts-ignore
+                oauth_token: res.oauth_token,
+                // @ts-ignore
+                oauth_token_secret: res.oauth_token_secret
+            })
+
         })
-    })
+    });
+};
+
+/**
+ * @param {GetAccessTokenRequest} query
+ * @returns {Promise<GetAccessTokenResponse>}
+ */
+Bot.prototype.getAccessToken = async function (query) {
+    return new Promise((resolve, reject) => {
+        request.get(`https://api.twitter.com/oauth/access_token`, {
+            timeout: 60000,
+            oauth: {
+                consumer_key: process.env.consumer_key,
+                consumer_secret: process.env.consumer_secret,
+                token: query.oauth_token,
+                verifier: query.oauth_verifier
+            }
+            // @ts-ignore
+        // @ts-ignore
+        }, (err, result, body) => {
+            if (err) return reject(err);
+
+            const res = querystring.decode(body)
+            if (!res.user_id) {
+                return reject(res)
+            }
+            // @ts-ignore
+            resolve(res)
+
+        })
+    });
+};
+
+/**
+ * @param {OAuthToken} query
+ * @returns {Promise<User>}
+ */
+Bot.prototype.getUserCredentials = async function (query) {
+    return new Promise((resolve, reject) => {
+        request.get(`${v1BaseUrl}/account/verify_credentials.json?include_email=true&skip_status=true&include_entities=false`, {
+            timeout: 60000,
+            oauth: {
+                consumer_key: process.env.consumer_key,
+                consumer_secret: process.env.consumer_secret,
+                token: query.oauth_token,
+                token_secret: query.oauth_token_secret
+            },
+
+            // @ts-ignore
+        // @ts-ignore
+        }, (err, result, body) => {
+            if (err) return reject(err);
+            const res = JSON.parse(body)
+            if (!(res && res.id)) {
+                reject(res)
+            }
+            // @ts-ignore
+            resolve(res)
+        })
+    });
 };
 
 /**
@@ -106,21 +180,121 @@ Bot.prototype.sendDirectMessage = function (userId, message) {
 
 /**
  * 
- * @param {{user_id?:string}} query 
- * @returns {Promise<{ids:number[], next_cursor:number}>}
+ * @param {{
+ *      next_cursor?:string,
+ *      user_id?:string, 
+ *      count?: number
+ *      auth: HttpConfigParam['oauth']
+ *   }} params 
+ * @returns {Promise<{ids:string[], next_cursor_str:string}>}
  */
-Bot.prototype.getFollowers = async function (query = {}) {
-    await limitFollowersCall();
-
-    const {
-        callback,
-        promise
-    } = getPromiseCallback()
-
-    this._twit.get('followers/ids', query, callback);
-
-    return promise;
+Bot.prototype.getFollowers = async function (params) {
+    return http(`${v1BaseUrl}/followers/ids.json`, {
+        method: 'get',
+        oauth: {
+            ...params.auth,
+            consumer_key: process.env.consumer_key,
+            consumer_secret: process.env.consumer_secret,
+        },
+        params: {
+            stringify_ids: true,
+            user_id: params.user_id,
+            ...(params.next_cursor ? {
+                cursor: params.next_cursor
+            } : null),
+            count: params.count,
+        }
+    });
 };
+
+
+/**
+ * 
+ * @param {{
+ *          user_id?:string, 
+ *          chunkSize: number,
+ *          auth: HttpConfigParam['oauth'],
+ *          rateLimitPoint: number
+ *      }} params 
+ * @returns {Promise<string[]>}
+ */
+Bot.prototype.getAllFollowers = async function (params) {
+    let nextCursor = null;
+    let followers = []
+    //Pause after 10 calls
+ 
+    let callCount = 0;
+    do {
+        callCount++;
+
+        const result = await this.getFollowers({
+            auth: params.auth,
+            user_id: params.user_id,
+            count: params.chunkSize,
+            next_cursor: nextCursor,
+        });
+
+        followers = [...followers, ...result.ids];
+
+        nextCursor = result.next_cursor_str;
+
+        if(callCount % params.rateLimitPoint === 0) {
+            const _15minutes = 1000 * 60 * 15;
+            await pause(_15minutes)
+            
+        }
+    }
+    while(nextCursor && nextCursor!== '0');
+
+    return followers;
+    
+}
+
+/**
+ * 
+ * @param {{
+ *      ids: String[]
+ *      auth: HttpConfigParam['oauth']
+ *   }} params 
+ * @returns {Promise<{id: string, name: string, username: string}[]>}
+ */
+Bot.prototype.getUsers = async function (params) {
+    return http(`https://api.twitter.com/2/users`, {
+        method: 'get',
+        oauth: {
+            ...params.auth,
+            consumer_key: process.env.consumer_key,
+            consumer_secret: process.env.consumer_secret,
+        },
+        params: {
+            ids: params.ids.join(',')
+        }
+    }).then((result) => result.data || []);
+};
+
+/**
+ * 
+ * @param {{
+ *      user_id?:string, 
+ *      auth: HttpConfigParam['oauth']
+ *   }} params 
+ * @returns {Promise<{}>}
+ */
+ Bot.prototype.followUser = function (params) {
+    return http(`${v1BaseUrl}/friendships/create.json`, {
+        method: 'post',
+        oauth: {
+            ...params.auth,
+            consumer_key: process.env.consumer_key,
+            consumer_secret: process.env.consumer_secret,
+        },
+        params: {
+            user_id: params.user_id
+        }
+    });
+};
+
+
 
 // choose a random tweet and follow that user
 Bot.prototype.searchFollow = function (params, callback) {
