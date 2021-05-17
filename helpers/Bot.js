@@ -239,7 +239,7 @@ Bot.prototype.getAllFollowers = async function (params) {
         nextCursor = result.next_cursor_str;
 
         if(callCount % params.rateLimitPoint === 0) {
-            const _15minutes = 1000 * 60 * 60;
+            const _15minutes = 1000 * 60 * 15;
             await pause(_15minutes)
             
         }

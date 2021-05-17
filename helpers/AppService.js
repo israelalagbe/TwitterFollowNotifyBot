@@ -136,8 +136,8 @@ exports.analyzeSubscribersFollowers = async () => {
 
     logger.info("Analysis ends in: ", Math.round(runningTime / 1000) + " sec")
 
-    // const breakTime = 1000 * 60 * 60
-    const breakTime = 1000 * 60 * 2
+    const breakTime = 1000 * 60 * 60 * 2
+    // const breakTime = 1000 * 60 * 2
 
     if (runningTime < breakTime) {
         await pause(breakTime - runningTime)
