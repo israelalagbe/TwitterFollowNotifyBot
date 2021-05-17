@@ -12,8 +12,7 @@ const userSchema = new mongoose.Schema({
         required: true,
     },
     email: {
-        type: String,
-        required: true,
+        type: String
     },
     twitter_user_id: {
         type: String,
