@@ -39,7 +39,7 @@ body {
   justify-content: center;
   color: black;
   text-shadow: 0 .05rem .1rem rgba(0, 0, 0, .2);
-  background:linear-gradient(to right, #E9F8FF, #bacbdf, #C1E3FF);
+  background:linear-gradient(to right,#E9F8FF,#c4d0df,#C1E3FF);
   animation: gradient 5s ease infinite;
   background-size: 400% 400%;
 }
