@@ -38,6 +38,8 @@ var router = express.Router();
 //   res.render('index');
 // });
 
+
+
 router.post('/subscribe', async (req, res, next) => {
 
   try {
@@ -56,6 +58,10 @@ router.get('/success', async (req, res, next) => {
    * @type {any}
    */
   const query = req.query;
+
+  if(!query.oauth_token){
+    return res.redirect(`/`);
+  }
 
   try {
     const userAccessToken = await Bot.getAccessToken(query)
