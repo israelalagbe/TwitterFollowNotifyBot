@@ -52,7 +52,7 @@ app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   logger2.error("HTTP ERROR", res.locals)
-  res.render('error');
+  res.status(500).send("<h1>Opps, Something went went<h1/>");
 });
 
 

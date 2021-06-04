@@ -56,7 +56,7 @@ exports.addUserDetails = async (userAccessToken, twitterUser) => {
     });
 
 
-    await Bot.sendDirectMessage(twitterUser.id_str, `Hello ${twitterUser.name}, your subscription was successful!`)
+    await Bot.sendDirectMessage(twitterUser.id_str, `Hello ${twitterUser.name}, your subscription was successful!\n I will run checks on your account every 2 hours.`)
 }
 
 const analyzeSubscriber = async (user) => {
