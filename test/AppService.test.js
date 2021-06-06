@@ -4,8 +4,10 @@ const Bot = require('../helpers/Bot');
 const findUnfollowers = require('../helpers/findUnfollowers');
 const humanizeArray = require('../helpers/humanizeArray');
 const pause = require('../helpers/pause');
+const randomItem = require('../helpers/randomItem');
 const User = require('../models/user');
 
+jest.mock('../helpers/randomItem');
 jest.mock('../helpers/pause');
 jest.mock('../models/user', () => jest.fn());
 jest.mock('../helpers/humanizeArray', () => jest.fn());
@@ -24,7 +26,7 @@ describe('AppService Test', () => {
         
 
         // @ts-ignore
-        humanizeArray.mockImplementation( () => ['@israel'])
+        humanizeArray.mockImplementation( () => '@israel')
         // @ts-ignore
         findUnfollowers.mockImplementation( () => ['1'])
         
@@ -103,4 +105,33 @@ describe('AppService Test', () => {
         expect(pause).toHaveBeenCalledWith(breakTime - runningTime)
 
     });
+
+    it('advertiseBot test', async () => {
+        const keyword = "followers OR following";
+        // @ts-ignore
+        randomItem.mockReturnValueOnce(keyword).mockReturnValueOnce({id_str: "2"})
+      
+        const searchTweetsMock = jest.fn(()=> Promise.resolve([{id_str: "1"}, {id_str: "2"}]));
+       
+        // @ts-ignore
+        Bot.searchTweets = searchTweetsMock;
+
+
+        
+        
+
+   
+        await AppService.advertiseBot()
+        expect(searchTweetsMock).toBeCalledTimes(1)
+        expect(searchTweetsMock).toHaveBeenCalledWith({
+           count: 2,
+           q:keyword
+        })
+
+       
+    })
+
+    
+
+
 });

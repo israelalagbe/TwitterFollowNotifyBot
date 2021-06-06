@@ -296,30 +296,11 @@ exports.getUsers = async function (params) {
     });
 };
 
-exports.getFollowers = async function (params) {
-    return http(`${v1BaseUrl}/followers/ids.json`, {
-        method: 'get',
-        oauth: {
-            ...params.auth,
-            consumer_key: process.env.consumer_key,
-            consumer_secret: process.env.consumer_secret,
-        },
-        params: {
-            stringify_ids: true,
-            user_id: params.user_id,
-            ...(params.next_cursor ? {
-                cursor: params.next_cursor
-            } : null),
-            count: params.count,
-        }
-    });
-};
-
 
 /**
  * 
  * @param {{q: string, count: number}} params 
- * @returns 
+ * @returns {Promise<Tweet[]>}
  */
 exports.searchTweets = async function (params) {
     return http(`${v1BaseUrl}/search/tweets.json`, {
@@ -338,10 +319,5 @@ exports.searchTweets = async function (params) {
             count: params.count,
             locale: 'en'
         }
-    });
-};
-
-function randIndex(arr) {
-    var index = Math.floor(arr.length * Math.random());
-    return arr[index];
+    }).then((res) => res.statuses);
 };

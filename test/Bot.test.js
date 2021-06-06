@@ -190,6 +190,7 @@ describe('Bot Test', () => {
       auth:{}
     })
 
+    expect(http).toHaveBeenCalledTimes(1);
     expect(response).toBeInstanceOf(Promise)
     expect(await response).toBe("Response")
 
@@ -258,16 +259,18 @@ describe('Bot Test', () => {
 
   it('Bot.searchTweets() should be called properly', async () => {
     // @ts-ignore
-    http.mockImplementation(() => Promise.resolve("Response"));
+    http.mockImplementation(() => Promise.resolve({
+      statuses: [{id_str: "2"}]
+    }));
 
     
     const response = Bot.searchTweets({
       q: "keyword",
       count: 20
     })
-
+    expect(http).toHaveBeenCalledTimes(1);
     expect(response).toBeInstanceOf(Promise)
-    expect(await response).toBe("Response")
+    expect(await response).toEqual([{id_str: "2"}])
 
   });
 });

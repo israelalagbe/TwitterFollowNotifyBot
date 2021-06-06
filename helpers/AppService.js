@@ -4,6 +4,7 @@ const Bot = require("./Bot");
 const findUnfollowers = require("./findUnfollowers");
 const humanizeArray = require("./humanizeArray");
 const pause = require("./pause");
+const randomItem = require("./randomItem");
 
 
 const followBotTwitterId = "1256620641706561536";
@@ -148,4 +149,21 @@ exports.analyzeSubscribersFollowers = async () => {
         breakTime: Math.round((Date.now() - analySisEnd) / 1000) + " sec",
         totalRunningTime: Math.round((Date.now() - analysisStart) / 1000) + " sec",
     })
+}
+
+exports.advertiseBot = async () => {
+    const searchKeywords = [
+        "how many followers do you want",
+        "followers OR following"
+    ];
+
+
+    const tweets = await Bot.searchTweets({
+        count: 2,
+        q: randomItem(searchKeywords)
+    });
+
+    const tweet = randomItem(tweets);
+    
+    
 }
