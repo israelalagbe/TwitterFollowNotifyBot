@@ -1,4 +1,5 @@
-//
+'use strict';
+
 //  Bot
 //  class for performing various twitter actions
 //
@@ -15,22 +16,19 @@ const pause = require('./pause');
 
 const v1BaseUrl = 'https://api.twitter.com/1.1';
 
-var Bot = function () {
-    const config = {
-        consumer_key: process.env.consumer_key,
-        consumer_secret: process.env.consumer_secret,
-        access_token: process.env.access_token,
-        access_token_secret: process.env.access_token_secret,
-        timeout_ms: 60 * 1000, // optional HTTP request timeout to apply to all requests.
-    }
-    this._twit = new Twit(config);
-};
 
+const config = {
+    consumer_key: process.env.consumer_key,
+    consumer_secret: process.env.consumer_secret,
+    access_token: process.env.access_token,
+    access_token_secret: process.env.access_token_secret,
+    timeout_ms: 60 * 1000, // optional HTTP request timeout to apply to all requests.
+}
 /**
  * 
  * @returns {Promise<{oauth_token:string, oauth_token_secret:string}>}
  */
-Bot.prototype.requestToken = async function () {
+exports.requestToken = async function () {
     return new Promise((resolve, reject) => {
 
         request.post(`https://api.twitter.com/oauth/request_token?oauth_callback=${encodeURIComponent(process.env.oauth_callback)}`, {
@@ -63,7 +61,7 @@ Bot.prototype.requestToken = async function () {
  * @param {GetAccessTokenRequest} query
  * @returns {Promise<GetAccessTokenResponse>}
  */
-Bot.prototype.getAccessToken = async function (query) {
+exports.getAccessToken = async function (query) {
     return new Promise((resolve, reject) => {
         request.get(`https://api.twitter.com/oauth/access_token`, {
             timeout: 60000,
@@ -93,7 +91,7 @@ Bot.prototype.getAccessToken = async function (query) {
  * @param {OAuthToken} query
  * @returns {Promise<User>}
  */
-Bot.prototype.getUserCredentials = async function (query) {
+exports.getUserCredentials = async function (query) {
     return new Promise((resolve, reject) => {
         request.get(`${v1BaseUrl}/account/verify_credentials.json?include_email=true&skip_status=true&include_entities=false`, {
             timeout: 60000,
@@ -123,7 +121,9 @@ Bot.prototype.getUserCredentials = async function (query) {
  * @param {string} status 
  * @returns {Promise}
  */
-Bot.prototype.tweet = function (status) {
+exports.tweet = function (status) {
+    const twit = new Twit(config);
+
     const {
         callback,
         promise
@@ -133,7 +133,8 @@ Bot.prototype.tweet = function (status) {
     } else if (status.length > 280) {
         return callback(new Error('tweet is too long: ' + status.length));
     }
-    this._twit.post('statuses/update', {
+
+    twit.post('statuses/update', {
         status: status
     }, callback);
 
@@ -146,7 +147,9 @@ Bot.prototype.tweet = function (status) {
  * @param {string} message 
  * @returns {Promise}
  */
-Bot.prototype.sendDirectMessage = function (userId, message) {
+exports.sendDirectMessage = function (userId, message) {
+    const twit = new Twit(config);
+    
     const {
         callback,
         promise
@@ -171,7 +174,7 @@ Bot.prototype.sendDirectMessage = function (userId, message) {
         }
     };
     // @ts-ignore
-    this._twit.post('direct_messages/events/new', payload, callback);
+    twit.post('direct_messages/events/new', payload, callback);
 
     return promise;
 };
@@ -188,7 +191,7 @@ Bot.prototype.sendDirectMessage = function (userId, message) {
  *   }} params 
  * @returns {Promise<{ids:string[], next_cursor_str:string}>}
  */
-Bot.prototype.getFollowers = async function (params) {
+exports.getFollowers = async function (params) {
     return http(`${v1BaseUrl}/followers/ids.json`, {
         method: 'get',
         oauth: {
@@ -218,7 +221,7 @@ Bot.prototype.getFollowers = async function (params) {
  *      }} params 
  * @returns {Promise<string[]>}
  */
-Bot.prototype.getAllFollowers = async function (params) {
+exports.getAllFollowers = async function (params) {
     let nextCursor = null;
     let followers = []
     //Pause after 10 calls
@@ -258,7 +261,7 @@ Bot.prototype.getAllFollowers = async function (params) {
  *   }} params 
  * @returns {Promise<{id: string, name: string, username: string}[]>}
  */
-Bot.prototype.getUsers = async function (params) {
+exports.getUsers = async function (params) {
     return http(`https://api.twitter.com/2/users`, {
         method: 'get',
         oauth: {
@@ -280,7 +283,7 @@ Bot.prototype.getUsers = async function (params) {
  *   }} params 
  * @returns {Promise<{}>}
  */
- Bot.prototype.followUser = function (params) {
+ exports.followUser = function (params) {
     return http(`${v1BaseUrl}/friendships/create.json`, {
         method: 'post',
         oauth: {
@@ -297,7 +300,7 @@ Bot.prototype.getUsers = async function (params) {
 
 
 // choose a random tweet and follow that user
-Bot.prototype.searchFollow = function (params, callback) {
+exports.searchFollow = function (params, callback) {
     var self = this;
 
     self._twit.get('search/tweets', params, function (err, reply) {
@@ -319,7 +322,7 @@ Bot.prototype.searchFollow = function (params, callback) {
 //
 // retweet
 //
-Bot.prototype.retweet = function (params, callback) {
+exports.retweet = function (params, callback) {
     var self = this;
 
     self._twit.get('search/tweets', params, function (err, reply) {
@@ -338,7 +341,7 @@ Bot.prototype.retweet = function (params, callback) {
 //
 // favorite a tweet
 //
-Bot.prototype.favorite = function (params, callback) {
+exports.favorite = function (params, callback) {
     var self = this;
 
     self._twit.get('search/tweets', params, function (err, reply) {
@@ -358,10 +361,10 @@ Bot.prototype.favorite = function (params, callback) {
 
 //  choose a random friend of one of your followers, and follow that user
 //
-Bot.prototype.mingle = function (callback) {
+exports.mingle = function (callback) {
     var self = this;
 
-    this._twit.get('followers/ids', function (err, reply) {
+    twit.get('followers/ids', function (err, reply) {
         if (err) {
             return callback(err);
         }
@@ -391,10 +394,10 @@ Bot.prototype.mingle = function (callback) {
 //
 //  prune your followers list; unfollow a friend that hasn't followed you back
 //
-Bot.prototype.prune = function (callback) {
+exports.prune = function (callback) {
     var self = this;
 
-    this._twit.get('followers/ids', function (err, reply) {
+    twit.get('followers/ids', function (err, reply) {
         if (err) return callback(err);
 
         // @ts-ignore
@@ -425,5 +428,3 @@ function randIndex(arr) {
     var index = Math.floor(arr.length * Math.random());
     return arr[index];
 };
-
-module.exports = new Bot();

@@ -1,19 +1,23 @@
 const Twit = require('twit');
 const Bot = require('../helpers/Bot');
+// @ts-ignore
 const getPromiseCallback = require('../helpers/getPromiseCallback');
 const http = require('../helpers/http');
 const pause = require('../helpers/pause');
 
 
-jest.mock('twit', () => class {
-  post(_, __, callback) {
-    callback(null, 'Response')
-  }
-  get(_, __, callback) {
-    callback(null, 'Response')
-  }
+// jest.mock('twit', () => class {
+  // post(_, __, callback) {
+  //   callback(null, 'Response')
+  // }
+//   get(_, __, callback) {
+//     callback(null, 'Response')
+//   }
 
-});
+// });
+
+jest.mock('twit');
+
 
 jest.mock('../helpers/rate_limiters', () => ({
   limitFollowersCall(){
@@ -25,34 +29,73 @@ jest.mock('../helpers/rate_limiters', () => ({
 jest.mock('../helpers/http');
 jest.mock('../helpers/pause');
 
+const config = {
+  consumer_key: 'consumerkey',
+  consumer_secret: 'consumer secret',
+  access_token: 'access token',
+  access_token_secret: 'access token secret',
+  timeout_ms: 60 * 1000, // optional HTTP request timeout to apply to all requests.
+}
 
 
 describe('Bot Test', () => {
+  // const twit = new Twit(config)
+
+  // @ts-ignore
+  const postFn = jest.fn((_, __, callback)=> callback(null, 'Response'))
   beforeEach(() => {
     jest.clearAllMocks()
     jest.resetAllMocks()
     jest.restoreAllMocks()
+    // @ts-ignore
+  
+    
   });
 
-  it('tweet() should have been called properly', () => {
+  it('tweet() should have been called properly', async () => {
+    const postFn = jest.fn((_, __, callback)=> callback(null, 'Response'))
+    // @ts-ignore
+    Twit.mockImplementation( () => {
+      return {
+        post: postFn,
+      };
+    });
+    
+    const twit = new Twit(config)
+    
 
-    const spy = jest.spyOn(Bot._twit, 'post')
-    Bot.tweet("Hello everyone")
-    expect(spy).toHaveBeenCalled()
+    await Bot.tweet("Hello everyone")
+    expect(postFn).toHaveBeenCalledTimes(1)
   })
-  it('Bot.tweet() argument test', () => {
+  it('Bot.tweet() argument test', async () => {
+    const postFn = jest.fn((_, __, callback)=> callback(null, 'Response'))
+    // @ts-ignore
+    Twit.mockImplementation( () => {
+      return {
+        post: postFn,
+      };
+    });
 
     const status = "Hello everyone";
 
-    const spy = jest.spyOn(Bot._twit, 'post')
-    Bot.tweet(status)
+    // @ts-ignore
+   
+    await Bot.tweet(status)
 
-    expect(spy).toHaveBeenCalledWith('statuses/update', {
+    expect(postFn).toHaveBeenCalledWith('statuses/update', {
       status
     }, expect.any(Function))
   })
 
   it('Bot.tweet() should return correct value', async () => {
+
+    const postFn = jest.fn((_, __, callback)=> callback(null, 'Response'))
+    // @ts-ignore
+    Twit.mockImplementation( () => {
+      return {
+        post: postFn,
+      };
+    });
 
     const status = "Hello everyone";
 
@@ -65,12 +108,30 @@ describe('Bot Test', () => {
 
   it('sendDirectMessage() should have been called properly', () => {
 
-    const spy = jest.spyOn(Bot._twit, 'post')
+    const postFn = jest.fn((_, __, callback)=> callback(null, 'Response'))
+    // @ts-ignore
+    Twit.mockImplementation( () => {
+      return {
+        post: postFn,
+      };
+    });
+
+ 
     Bot.sendDirectMessage("12345678", "Hello everyone")
-    expect(spy).toHaveBeenCalled()
+
+    expect(postFn).toHaveBeenCalled()
   })
 
   it('sendDirectMessage() argument test', async () => {
+
+     const postFn = jest.fn((_, __, callback)=> callback(null, 'Response'))
+    // @ts-ignore
+    Twit.mockImplementation( () => {
+      return {
+        post: postFn,
+      };
+    });
+    
 
     const message = "Hello, world";
     const userId = "12345678"
@@ -89,14 +150,27 @@ describe('Bot Test', () => {
     };
 
 
-    const spy = jest.spyOn(Bot._twit, 'post')
+    
     await Bot.sendDirectMessage(userId, message)
 
-    expect(spy).toHaveBeenCalledWith('direct_messages/events/new', payload, expect.any(Function))
+    expect(postFn).toHaveBeenCalledWith('direct_messages/events/new', payload, expect.any(Function))
   })
 
   it('Bot.sendDirectMessage() should return correct value', async () => {
 
+    const postFn = jest.fn((_, __, callback)=> callback(null, 'Response'))
+    // @ts-ignore
+    Twit.mockImplementation( () => {
+      return {
+        post: postFn,
+      };
+    });
+    
+
+    const twit = new Twit(config)
+    
+    
+    // @ts-ignore
     const status = "Hello everyone";
 
     const response = Bot.sendDirectMessage("1234", 'hey')
