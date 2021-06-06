@@ -121,25 +121,32 @@ exports.getUserCredentials = async function (query) {
  * @param {{status: string, in_reply_to_status_id?: string}} param 
  * @returns {Promise}
  */
-exports.tweet = function ({status, in_reply_to_status_id}) {
-    const twit = new Twit(config);
-
-    const {
-        callback,
-        promise
-    } = getPromiseCallback()
+exports.tweet = async function ({status, in_reply_to_status_id}) {
+    
     if (typeof status !== 'string') {
-        return callback(new Error('tweet must be of type String'));
+        throw new Error('tweet must be of type String');
     } else if (status.length > 280) {
-        return callback(new Error('tweet is too long: ' + status.length));
+        throw new Error('tweet is too long: ' + status.length);
     }
 
-    twit.post('statuses/update', {
-        status: status,
-        in_reply_to_status_id
-    }, callback);
-
-    return promise;
+    
+    return http(`${v1BaseUrl}/statuses/update.json`, {
+        method: 'post',
+        oauth: {
+            token: process.env.access_token,
+            token_secret: process.env.access_token_secret,
+            consumer_key: process.env.consumer_key,
+            consumer_secret: process.env.consumer_secret,
+        },
+        body: {
+            status,
+            ...(in_reply_to_status_id? {
+                in_reply_to_status_id
+            } : null),
+          
+        }
+    });
+   
 };
 
 /**

@@ -165,5 +165,13 @@ exports.advertiseBot = async () => {
 
     const tweet = randomItem(tweets);
 
-    
+    const status = `I help you monitor your unfollowers and notify you via DM when someone unfollows you. Click the link below to sign up:\nhttps://follownotifybot.xyz/\n\n@${tweet.user.screen_name}`;
+    await Bot.tweet({
+        status,
+        in_reply_to_status_id: tweet.id_str
+    })
+    console.log({
+        status,
+        in_reply_to_status_id: tweet.id_str
+    })
 }

@@ -109,13 +109,14 @@ describe('AppService Test', () => {
     it('advertiseBot test', async () => {
         const keyword = "followers OR following";
         // @ts-ignore
-        randomItem.mockReturnValueOnce(keyword).mockReturnValueOnce({id_str: "2"})
+        randomItem.mockReturnValueOnce(keyword).mockReturnValueOnce({id_str: "2", user: {screen_name: "israel"}})
       
         const searchTweetsMock = jest.fn(()=> Promise.resolve([{id_str: "1"}, {id_str: "2"}]));
+        const tweetMock = jest.fn(()=> Promise.resolve({}));
        
         // @ts-ignore
         Bot.searchTweets = searchTweetsMock;
-
+        Bot.tweet = tweetMock;
 
         
         
@@ -129,6 +130,16 @@ describe('AppService Test', () => {
            count: 20,
            q:keyword
         })
+
+        
+        expect(tweetMock).toBeCalledTimes(1)
+
+        const status = "I help you monitor your unfollowers and notify you via DM when someone unfollows you. Click the link below to sign up:\nhttps://follownotifybot.xyz/\n\n@israel";
+
+        expect(tweetMock).toHaveBeenCalledWith({
+            status,
+            in_reply_to_status_id: "2"
+         })
 
        
     })

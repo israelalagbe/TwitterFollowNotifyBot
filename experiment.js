@@ -16,8 +16,8 @@ mongoose.connect(process.env.mongodb_database_url, {useNewUrlParser: true, useUn
 (async () => {
     // const user = await User.findOne({username: "FollowNotifyBot"});
     try{
-      Bot.tweet({status: "Hello world!"});
-        // await advertiseBot();
+      // Bot.tweet({status: "Hello world!"});
+        await advertiseBot();
         console.log("Done")
     }
     catch(e){

@@ -53,28 +53,20 @@ describe('Bot Test', () => {
   });
 
   it('tweet() should have been called properly', async () => {
-    const postFn = jest.fn((_, __, callback)=> callback(null, 'Response'))
     // @ts-ignore
-    Twit.mockImplementation( () => {
-      return {
-        post: postFn,
-      };
-    });
+    http.mockImplementation(() => Promise.resolve("Response"));
     
     const twit = new Twit(config)
     
 
     await Bot.tweet({status:"Hello everyone" })
-    expect(postFn).toHaveBeenCalledTimes(1)
+    expect(http).toHaveBeenCalledTimes(1)
   })
   it('Bot.tweet() argument test', async () => {
-    const postFn = jest.fn((_, __, callback)=> callback(null, 'Response'))
+    
     // @ts-ignore
-    Twit.mockImplementation( () => {
-      return {
-        post: postFn,
-      };
-    });
+    http.mockImplementation(() => Promise.resolve("Response"));
+    
 
     const status = "Hello everyone";
     const in_reply_to_status_id = "1234"
@@ -82,21 +74,21 @@ describe('Bot Test', () => {
    
     await Bot.tweet({status, in_reply_to_status_id: "1234"})
 
-    expect(postFn).toHaveBeenCalledWith('statuses/update', {
-      status,
-      in_reply_to_status_id
-    }, expect.any(Function))
+    expect(http).toHaveBeenCalledWith('https://api.twitter.com/1.1/statuses/update.json', {
+      body: {
+        status,
+        in_reply_to_status_id
+      },
+      method: 'post',
+      oauth: expect.any(Object)
+    })
   })
 
   it('Bot.tweet() should return correct value', async () => {
 
-    const postFn = jest.fn((_, __, callback)=> callback(null, 'Response'))
+    
     // @ts-ignore
-    Twit.mockImplementation( () => {
-      return {
-        post: postFn,
-      };
-    });
+    http.mockImplementation(() => Promise.resolve("Response"));
 
     const status = "Hello everyone";
 
