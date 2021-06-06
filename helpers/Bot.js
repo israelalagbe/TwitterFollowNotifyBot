@@ -210,7 +210,6 @@ exports.getFollowers = async function (params) {
     });
 };
 
-
 /**
  * 
  * @param {{
@@ -297,130 +296,48 @@ exports.getUsers = async function (params) {
     });
 };
 
-
-
-// choose a random tweet and follow that user
-exports.searchFollow = function (params, callback) {
-    var self = this;
-
-    self._twit.get('search/tweets', params, function (err, reply) {
-        if (err) return callback(err);
-
-        // @ts-ignore
-        var tweets = reply.statuses;
-        var rTweet = randIndex(tweets)
-        if (typeof rTweet != 'undefined') {
-            var target = rTweet.user.id_str;
-
-            self._twit.post('friendships/create', {
-                id: target
-            }, callback);
+exports.getFollowers = async function (params) {
+    return http(`${v1BaseUrl}/followers/ids.json`, {
+        method: 'get',
+        oauth: {
+            ...params.auth,
+            consumer_key: process.env.consumer_key,
+            consumer_secret: process.env.consumer_secret,
+        },
+        params: {
+            stringify_ids: true,
+            user_id: params.user_id,
+            ...(params.next_cursor ? {
+                cursor: params.next_cursor
+            } : null),
+            count: params.count,
         }
     });
 };
 
-//
-// retweet
-//
-exports.retweet = function (params, callback) {
-    var self = this;
 
-    self._twit.get('search/tweets', params, function (err, reply) {
-        if (err) return callback(err);
-
-        // @ts-ignore
-        var tweets = reply.statuses;
-        var randomTweet = randIndex(tweets);
-        if (typeof randomTweet != 'undefined')
-            self._twit.post('statuses/retweet/:id', {
-                id: randomTweet.id_str
-            }, callback);
-    });
-};
-
-//
-// favorite a tweet
-//
-exports.favorite = function (params, callback) {
-    var self = this;
-
-    self._twit.get('search/tweets', params, function (err, reply) {
-        if (err) return callback(err);
-
-        // @ts-ignore
-        var tweets = reply.statuses;
-        var randomTweet = randIndex(tweets);
-        if (typeof randomTweet != 'undefined')
-            self._twit.post('favorites/create', {
-                id: randomTweet.id_str
-            }, callback);
-    });
-};
-
-//
-
-//  choose a random friend of one of your followers, and follow that user
-//
-exports.mingle = function (callback) {
-    var self = this;
-
-    twit.get('followers/ids', function (err, reply) {
-        if (err) {
-            return callback(err);
+/**
+ * 
+ * @param {{q: string, count: number}} params 
+ * @returns 
+ */
+exports.searchTweets = async function (params) {
+    return http(`${v1BaseUrl}/search/tweets.json`, {
+        method: 'get',
+        oauth: {
+            token: process.env.access_token,
+            token_secret: process.env.access_token_secret,
+            consumer_key: process.env.consumer_key,
+            consumer_secret: process.env.consumer_secret,
+        },
+        params: {
+            q: params.q,
+            // ...(params.next_cursor ? {
+            //     cursor: params.next_cursor
+            // } : null),
+            count: params.count,
+            locale: 'en'
         }
-
-        // @ts-ignore
-        var followers = reply.ids,
-            randFollower = randIndex(followers);
-
-        self._twit.get('friends/ids', {
-            user_id: randFollower
-        }, function (err, reply) {
-            if (err) {
-                return callback(err);
-            }
-
-            // @ts-ignore
-            var friends = reply.ids,
-                target = randIndex(friends);
-
-            self._twit.post('friendships/create', {
-                id: target
-            }, callback);
-        })
-    })
-};
-
-//
-//  prune your followers list; unfollow a friend that hasn't followed you back
-//
-exports.prune = function (callback) {
-    var self = this;
-
-    twit.get('followers/ids', function (err, reply) {
-        if (err) return callback(err);
-
-        // @ts-ignore
-        var followers = reply.ids;
-
-        self._twit.get('friends/ids', function (err, reply) {
-            if (err) return callback(err);
-
-            // @ts-ignore
-            var friends = reply.ids,
-                pruned = false;
-
-            while (!pruned) {
-                var target = randIndex(friends);
-
-                if (!~followers.indexOf(target)) {
-                    pruned = true;
-                    self._twit.post('friendships/destroy', {
-                        id: target
-                    }, callback);
-                }
-            }
-        });
     });
 };
 

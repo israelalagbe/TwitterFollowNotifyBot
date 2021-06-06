@@ -255,4 +255,19 @@ describe('Bot Test', () => {
     expect(pause).toBeCalledWith(_15minutes)
 
   });
+
+  it('Bot.searchTweets() should be called properly', async () => {
+    // @ts-ignore
+    http.mockImplementation(() => Promise.resolve("Response"));
+
+    
+    const response = Bot.searchTweets({
+      q: "keyword",
+      count: 20
+    })
+
+    expect(response).toBeInstanceOf(Promise)
+    expect(await response).toBe("Response")
+
+  });
 });
