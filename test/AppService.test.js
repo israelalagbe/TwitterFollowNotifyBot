@@ -122,9 +122,11 @@ describe('AppService Test', () => {
 
    
         await AppService.advertiseBot()
+
+        expect(randomItem).toBeCalledTimes(2)
         expect(searchTweetsMock).toBeCalledTimes(1)
         expect(searchTweetsMock).toHaveBeenCalledWith({
-           count: 2,
+           count: 20,
            q:keyword
         })
 

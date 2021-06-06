@@ -64,7 +64,7 @@ describe('Bot Test', () => {
     const twit = new Twit(config)
     
 
-    await Bot.tweet("Hello everyone")
+    await Bot.tweet({status:"Hello everyone" })
     expect(postFn).toHaveBeenCalledTimes(1)
   })
   it('Bot.tweet() argument test', async () => {
@@ -77,13 +77,14 @@ describe('Bot Test', () => {
     });
 
     const status = "Hello everyone";
-
+    const in_reply_to_status_id = "1234"
     // @ts-ignore
    
-    await Bot.tweet(status)
+    await Bot.tweet({status, in_reply_to_status_id: "1234"})
 
     expect(postFn).toHaveBeenCalledWith('statuses/update', {
-      status
+      status,
+      in_reply_to_status_id
     }, expect.any(Function))
   })
 
@@ -99,7 +100,7 @@ describe('Bot Test', () => {
 
     const status = "Hello everyone";
 
-    const response = Bot.tweet(status)
+    const response = Bot.tweet({status})
 
     expect(response).toBeInstanceOf(Promise)
     expect(await response).toBe("Response")

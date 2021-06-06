@@ -118,10 +118,10 @@ exports.getUserCredentials = async function (query) {
 
 /**
  * Post a tweet
- * @param {string} status 
+ * @param {{status: string, in_reply_to_status_id?: string}} param 
  * @returns {Promise}
  */
-exports.tweet = function (status) {
+exports.tweet = function ({status, in_reply_to_status_id}) {
     const twit = new Twit(config);
 
     const {
@@ -135,7 +135,8 @@ exports.tweet = function (status) {
     }
 
     twit.post('statuses/update', {
-        status: status
+        status: status,
+        in_reply_to_status_id
     }, callback);
 
     return promise;

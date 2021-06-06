@@ -159,11 +159,11 @@ exports.advertiseBot = async () => {
 
 
     const tweets = await Bot.searchTweets({
-        count: 2,
+        count: 20,
         q: randomItem(searchKeywords)
     });
 
     const tweet = randomItem(tweets);
-    
+
     
 }
