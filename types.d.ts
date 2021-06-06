@@ -104,3 +104,16 @@ interface Tweet {
   possibly_sensitive:        boolean;
   lang:                      string;
 }
+
+interface Media {
+  media_id:           number;
+  media_id_string:    string;
+  media_key:          string;
+  size:               number;
+  expires_after_secs: number;
+  image:              {
+    image_type: string;
+    w:          number;
+    h:          number;
+  };
+}

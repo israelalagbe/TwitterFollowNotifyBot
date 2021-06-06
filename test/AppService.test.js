@@ -113,10 +113,13 @@ describe('AppService Test', () => {
       
         const searchTweetsMock = jest.fn(()=> Promise.resolve([{id_str: "1"}, {id_str: "2"}]));
         const tweetMock = jest.fn(()=> Promise.resolve({}));
+        const uploadMediaMock = jest.fn((filePath)=> Promise.resolve({media_id_string: '125'}));
        
         // @ts-ignore
         Bot.searchTweets = searchTweetsMock;
         Bot.tweet = tweetMock;
+        // @ts-ignore
+        Bot.uploadMedia = uploadMediaMock;
 
         
         
@@ -134,11 +137,12 @@ describe('AppService Test', () => {
         
         expect(tweetMock).toBeCalledTimes(1)
 
-        const status = "I help you monitor your unfollowers and notify you via DM when someone unfollows you. Click the link below to sign up:\nhttps://follownotifybot.xyz/\n\n@israel";
+        const status = "Hey @israel,\nI can help you monitor your unfollowers and notify you via DM when someone unfollows you. Click the link below to sign up:\nhttps://follownotifybot.xyz/";
 
         expect(tweetMock).toHaveBeenCalledWith({
             status,
-            in_reply_to_status_id: "2"
+            in_reply_to_status_id: "2", 
+            media_ids: "125"
          })
 
        

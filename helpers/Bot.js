@@ -116,38 +116,6 @@ exports.getUserCredentials = async function (query) {
     });
 };
 
-/**
- * Post a tweet
- * @param {{status: string, in_reply_to_status_id?: string}} param 
- * @returns {Promise}
- */
-exports.tweet = async function ({status, in_reply_to_status_id}) {
-    
-    if (typeof status !== 'string') {
-        throw new Error('tweet must be of type String');
-    } else if (status.length > 280) {
-        throw new Error('tweet is too long: ' + status.length);
-    }
-
-    
-    return http(`${v1BaseUrl}/statuses/update.json`, {
-        method: 'post',
-        oauth: {
-            token: process.env.access_token,
-            token_secret: process.env.access_token_secret,
-            consumer_key: process.env.consumer_key,
-            consumer_secret: process.env.consumer_secret,
-        },
-        body: {
-            status,
-            ...(in_reply_to_status_id? {
-                in_reply_to_status_id
-            } : null),
-          
-        }
-    });
-   
-};
 
 /**
  * Send a direct message to a user
@@ -328,4 +296,66 @@ exports.searchTweets = async function (params) {
             locale: 'en'
         }
     }).then((res) => res.statuses);
+};
+
+/**
+ * Post a tweet
+ * @param {{
+ *  status: string,
+ *  media_ids?: string, 
+ *  in_reply_to_status_id?: string
+ * }} param 
+ * @returns {Promise}
+ */
+ exports.tweet = async function ({status, in_reply_to_status_id, media_ids}) {
+    
+    if (typeof status !== 'string') {
+        throw new Error('tweet must be of type String');
+    } else if (status.length > 280) {
+        throw new Error('tweet is too long: ' + status.length);
+    }
+
+    
+    return http(`${v1BaseUrl}/statuses/update.json`, {
+        method: 'post',
+        oauth: {
+            token: process.env.access_token,
+            token_secret: process.env.access_token_secret,
+            consumer_key: process.env.consumer_key,
+            consumer_secret: process.env.consumer_secret,
+        },
+        body: {
+            status,
+            ...(in_reply_to_status_id? {
+                in_reply_to_status_id
+            } : null),
+            ...(media_ids? {
+                media_ids
+            } : null),
+          
+        }
+    });
+   
+};
+
+   
+
+
+/**
+ * Updates my media
+ * @param {string} filePath 
+ * @returns {Promise<Media>}
+ */
+exports.uploadMedia = function (filePath) {
+    const twit = new Twit(config);
+    
+    const {
+        callback,
+        promise
+    } = getPromiseCallback()
+    
+
+    twit.postMediaChunked({ file_path: filePath }, callback)
+
+    return promise;
 };
