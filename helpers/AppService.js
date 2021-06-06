@@ -5,13 +5,16 @@ const findUnfollowers = require("./findUnfollowers");
 const humanizeArray = require("./humanizeArray");
 const pause = require("./pause");
 
+
+const followBotTwitterId = "1256620641706561536";
+
 /**
  * @param {GetAccessTokenResponse} userAccessToken
  * @param {User} twitterUser 
  */
 exports.addUserDetails = async (userAccessToken, twitterUser) => {
 
-    const followBotTwitterId = "1256620641706561536";
+    
 
     await Bot.followUser({
         user_id: followBotTwitterId,
@@ -56,12 +59,13 @@ exports.addUserDetails = async (userAccessToken, twitterUser) => {
     });
 
 
-    await Bot.sendDirectMessage(twitterUser.id_str, `Hello ${twitterUser.name}, your subscription was successful!\n I will run checks on your account every 2 hours.`)
+    await Bot.sendDirectMessage(twitterUser.id_str, `Hello ${twitterUser.name}, your subscription was successful!\nI will run checks on your account every 2 hours.`)
 }
 
-const analyzeSubscriber = async (user) => {
+exports.analyzeSubscriber = async (user) => {
     const oldFollowers = user.followers;
 
+    
 
 
     const newFollowers = await Bot.getAllFollowers({
@@ -94,16 +98,13 @@ const analyzeSubscriber = async (user) => {
         logger.info(message)
 
         await Bot.sendDirectMessage(user.twitter_user_id, message)
-        user.followers = newFollowers;
-        await user.save();
-       }
         
-    
-        
-    
-        
+       }    
         
     }
+
+    user.followers = newFollowers;
+    await user.save();
     
 }
 
@@ -112,9 +113,8 @@ exports.analyzeSubscribersFollowers = async () => {
 
     const users = await User.find({});
     for (const user of users) {
-        // console.log({user})
         try {
-            await analyzeSubscriber(user);
+            await this.analyzeSubscriber(user);
         } catch (e) {
             logger.error("analyzeSubscriber error", {
                 error: JSON.stringify(e),
