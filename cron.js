@@ -9,7 +9,7 @@ require('dotenv').config();
 const logger = require('./config/logger');
 
 
-const { analyzeSubscribersFollowers } = require('./helpers/AppService');
+const { analyzeSubscribersFollowers, advertiseBot } = require('./helpers/AppService');
 
 const Bot = require('./helpers/Bot');
 const pause = require('./helpers/pause');
@@ -29,19 +29,17 @@ mongoose.connect(process.env.mongodb_database_url, {useNewUrlParser: true, useUn
   }
 })();
 
-console.time('cron')
-// cron.schedule('* * * * * *', async () => {
-//   try {
-//     console.log("hehe")
-//     // await axios.get('http://localhost:8005/api/user')
-//     console.timeLog('cron')
-//   } catch (e) {
-//     // logger.error("cron error", e)
-//     // process.exit(1);
-//   }
+//Run every 2 hours
+cron.schedule('0 */2 * * *', async () => {
+  try {
+    logger.error("advert started")
+    await advertiseBot();
+  } catch (e) {
+    logger.error("cron error", e)
+    // process.exit(1);
+  }
 
-
-// }, {
-//   scheduled: true,
-//   timezone: "Africa/Lagos"
-// });
+}, {
+  scheduled: true,
+  timezone: "Africa/Lagos"
+});
