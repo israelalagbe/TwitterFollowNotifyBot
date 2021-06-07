@@ -137,7 +137,7 @@ describe('AppService Test', () => {
         
         expect(tweetMock).toBeCalledTimes(1)
 
-        const status = "Hey @israel,\nI can help you monitor your unfollowers and notify you via DM when someone unfollows you. Click the link below to sign up:\nhttps://follownotifybot.xyz/";
+        const status = "I can help you monitor your unfollowers and notify you via DM when someone unfollows you. Click the link below to sign up:\nhttps://follownotifybot.xyz/";
 
         expect(tweetMock).toHaveBeenCalledWith({
             status,

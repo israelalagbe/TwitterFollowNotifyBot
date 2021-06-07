@@ -165,7 +165,7 @@ exports.advertiseBot = async () => {
 
     const tweet = randomItem(tweets);
 
-    const status = `Hey @${tweet.user.screen_name},\nI can help you monitor your unfollowers and notify you via DM when someone unfollows you. Click the link below to sign up:\nhttps://follownotifybot.xyz/`;
+    const status = `I can help you monitor your unfollowers and notify you via DM when someone unfollows you. Click the link below to sign up:\nhttps://follownotifybot.xyz/`;
     
     var filePath = 'public/botScreenshot.jpg'
     const media = await Bot.uploadMedia(filePath)

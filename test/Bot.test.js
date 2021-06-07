@@ -77,7 +77,8 @@ describe('Bot Test', () => {
     expect(http).toHaveBeenCalledWith('https://api.twitter.com/1.1/statuses/update.json', {
       body: {
         status,
-        in_reply_to_status_id
+        in_reply_to_status_id,
+        auto_populate_reply_metadata: true
       },
       method: 'post',
       oauth: expect.any(Object)

@@ -30,7 +30,7 @@ mongoose.connect(process.env.mongodb_database_url, {useNewUrlParser: true, useUn
 })();
 
 //Run every 2 hours
-cron.schedule('0 */12 * * *', async () => {
+cron.schedule('0 */4 * * *', async () => {
   try {
     logger.error("advert started")
     await advertiseBot();

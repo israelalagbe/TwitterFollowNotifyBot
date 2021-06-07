@@ -332,6 +332,7 @@ exports.searchTweets = async function (params) {
             ...(media_ids? {
                 media_ids
             } : null),
+            auto_populate_reply_metadata: true
           
         }
     });
