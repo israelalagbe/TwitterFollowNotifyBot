@@ -148,6 +148,74 @@ describe('AppService Test', () => {
        
     })
 
+    it('followUserFollower test', async () => {
+        
+
+        const getUsersMock = jest.fn(()=> Promise.resolve([
+            {id: '1', name: 'Israel', username: 'israel'}
+        ]));
+
+        const sendDirectMessageMock = jest.fn(()=> Promise.resolve("Response"));
+
+        const userSaveMock = jest.fn();
+
+        const userFollower = {
+            name: "MyName",
+            followers: ['1', '2', '3'],
+            twitter_user_id: "twitter_id",
+            access_token: "access token",
+            access_token_secret: "access token secret",
+            save: userSaveMock
+        }
+
+       
+        // @ts-ignore
+        User.find = jest.fn().mockResolvedValueOnce([userFollower]);
+
+        // @ts-ignore
+        randomItem.mockReturnValueOnce(userFollower).mockReturnValueOnce('5');
+
+       
+        
+        // @ts-ignore
+        User.findOne = jest.fn().mockResolvedValueOnce({followers: ["1", "5", "2"]}).mockResolvedValueOnce(["5", "3"]);
+
+        const followUserMock = jest.fn();
+
+        // @ts-ignore
+        
+        Bot.getUsers = getUsersMock;
+        Bot.sendDirectMessage = sendDirectMessageMock;
+        Bot.followUser = followUserMock;
+        
+
+   
+        await AppService.followUserFollower()
+
+        expect(randomItem).toHaveBeenCalledTimes(2);
+        expect(randomItem).toHaveBeenCalledWith([userFollower])
+        expect(randomItem).toHaveBeenCalledWith(['5', '3'])
+        
+
+        expect(User.find).toHaveBeenCalledTimes(1)
+        expect(User.find).toHaveBeenCalledWith({username: { $ne: 'FollowNotifyBot' }});
+
+        expect(User.findOne).toHaveBeenCalledTimes(1)
+        expect(User.findOne).toHaveBeenCalledWith({username: 'FollowNotifyBot'});
+
+        expect(getUsersMock).toHaveBeenCalledWith({
+            auth: {
+                token: userFollower.access_token,
+                token_secret: userFollower.access_token_secret
+            }, 
+            ids: ["5"]
+        })
+
+        const followBotTwitterId = "1256620641706561536";
+        const message = "Automatic following: @israel"
+        expect(sendDirectMessageMock).toHaveBeenCalledWith(followBotTwitterId, message)
+    })
+
     
 
 

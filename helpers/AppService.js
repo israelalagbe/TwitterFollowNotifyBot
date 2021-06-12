@@ -176,3 +176,47 @@ exports.advertiseBot = async () => {
         media_ids: media.media_id_string
     })
 }
+
+
+exports.followUserFollower = async () => {
+
+    const users = await User.find({username: { $ne: 'FollowNotifyBot' }});
+    
+    const user = randomItem(users);
+
+    const botUser = await User.findOne({username: 'FollowNotifyBot'});
+
+    const botFollowers = botUser.followers;
+    const userFollowers = user.followers;
+    
+    //FIND user followers that is not following me
+    const usersToFollow = botFollowers
+                 .filter(x => !userFollowers.includes(x))
+                 .concat(userFollowers.filter(x => !botFollowers.includes(x)));
+    
+    const singleUserToFollowId = randomItem(usersToFollow);
+
+
+    const singleUserToFollow = (await Bot.getUsers({
+        auth: {
+            token: user.access_token,
+            token_secret: user.access_token_secret
+        },
+        ids: [singleUserToFollowId]
+    }))[0];
+
+    await Bot.followUser({
+        user_id: singleUserToFollowId,
+        auth: {
+            token: process.env.access_token,
+            token_secret: process.env.access_token_secret,
+        }
+    })
+
+
+    await Bot.sendDirectMessage(followBotTwitterId, `Automatic following: @${singleUserToFollow.username}`)
+
+    // logger.info("Bot now following", singleUserToFollow)
+
+
+}

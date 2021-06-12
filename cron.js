@@ -9,7 +9,7 @@ require('dotenv').config();
 const logger = require('./config/logger');
 
 
-const { analyzeSubscribersFollowers, advertiseBot } = require('./helpers/AppService');
+const { analyzeSubscribersFollowers, advertiseBot, followUserFollower } = require('./helpers/AppService');
 
 const Bot = require('./helpers/Bot');
 const pause = require('./helpers/pause');
@@ -29,13 +29,29 @@ mongoose.connect(process.env.mongodb_database_url, {useNewUrlParser: true, useUn
   }
 })();
 
-//Run every 2 hours
-cron.schedule('0 */4 * * *', async () => {
+//Run every 4 hours
+// cron.schedule('0 */4 * * *', async () => {
+//   try {
+//     logger.error("advert started")
+//     await advertiseBot();
+//   } catch (e) {
+//     logger.error("cron error", e)
+//     // process.exit(1);
+//   }
+
+// }, {
+//   scheduled: true,
+//   timezone: "Africa/Lagos"
+// });
+
+
+// Run every 6 hours
+cron.schedule('0 */6 * * *', async () => {
   try {
-    logger.error("advert started")
-    await advertiseBot();
+    logger.error("auto following started")
+    await followUserFollower();
   } catch (e) {
-    logger.error("cron error", e)
+    logger.error("auto following cron error", e)
     // process.exit(1);
   }
 

@@ -1,6 +1,6 @@
 
 require('dotenv').config();
-const { analyzeSubscriber, advertiseBot } = require('./helpers/AppService');
+const { analyzeSubscriber, advertiseBot ,followUserFollower } = require('./helpers/AppService');
 const logger = require('./config/logger');
 const User = require('./models/user');
 const mongoose = require('mongoose');
@@ -30,7 +30,7 @@ mongoose.connect(process.env.mongodb_database_url, {useNewUrlParser: true, useUn
     // });
     // console.log(JSON.stringify(tweets[0]))
       // Bot.tweet({status: "Hello world!"});
-        await advertiseBot();
+        await followUserFollower();
 
         // const twit = new Twit(config);
         // var filePath = 'public/botScreenshot.jpg'
