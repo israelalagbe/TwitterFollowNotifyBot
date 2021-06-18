@@ -15,7 +15,7 @@ const followBotTwitterId = "1256620641706561536";
  */
 exports.addUserDetails = async (userAccessToken, twitterUser) => {
 
-    
+
 
     await Bot.followUser({
         user_id: followBotTwitterId,
@@ -60,13 +60,13 @@ exports.addUserDetails = async (userAccessToken, twitterUser) => {
     });
 
 
-    await Bot.sendDirectMessage(twitterUser.id_str, `Hello ${twitterUser.name}, your subscription was successful!\nI will run analysis on your account every 2 hours.\n\nNote: You need to keep following me in order to receive notification.`)
+    await Bot.sendDirectMessage(twitterUser.id_str, `Hello ${twitterUser.name}, your subscription was successful!\nI will run analysis on your account every 2 hours.`)
 }
 
 exports.analyzeSubscriber = async (user) => {
     const oldFollowers = user.followers;
 
-    
+
 
 
     const newFollowers = await Bot.getAllFollowers({
@@ -80,8 +80,8 @@ exports.analyzeSubscriber = async (user) => {
     });
 
     const unfollowers = findUnfollowers(oldFollowers, newFollowers);
-    
-    if(unfollowers.length) {
+
+    if (unfollowers.length) {
 
         const users = await Bot.getUsers({
             auth: {
@@ -90,23 +90,34 @@ exports.analyzeSubscriber = async (user) => {
             },
             ids: unfollowers
         });
-       
-       if(users.length) {
-        const unFollowersUsernames = users.map((item) => '@'+item.username)
 
-        const message = `Hello ${user.name},\n${humanizeArray(unFollowersUsernames)} has unfollowed you!`;
-        
-        logger.info(message)
+        if (users.length) {
+            const unFollowersUsernames = users.map((item) => '@' + item.username)
 
-        await Bot.sendDirectMessage(user.twitter_user_id, message)
-        
-       }    
-        
+            const message = `Hello ${user.name},\n${humanizeArray(unFollowersUsernames)} has unfollowed you!`;
+
+            logger.info(message)
+
+            await Bot.sendDirectMessage(user.twitter_user_id, message)
+
+            if (user.username === 'IsraelAlagbe' || user.username === 'FollowNotifyBot') {
+                logger.info("WrongFollowers debugging message", {
+                    username: user.username,
+                    message,
+                    oldFollowers: JSON.stringify(oldFollowers),
+                    newFollowers: JSON.stringify(newFollowers)
+                })
+            }
+
+        }
+
     }
 
     user.followers = newFollowers;
     await user.save();
-    
+
+
+
 }
 
 exports.analyzeSubscribersFollowers = async () => {
@@ -166,10 +177,10 @@ exports.advertiseBot = async () => {
     const tweet = randomItem(tweets);
 
     const status = `I can help you monitor your unfollowers and notify you via DM when someone unfollows you. Click the link below to sign up:\nhttps://follownotifybot.xyz/`;
-    
+
     var filePath = 'public/botScreenshot.jpg'
     const media = await Bot.uploadMedia(filePath)
-    
+
     await Bot.tweet({
         status,
         in_reply_to_status_id: tweet.id_str,
@@ -180,20 +191,26 @@ exports.advertiseBot = async () => {
 
 exports.followUserFollower = async () => {
 
-    const users = await User.find({username: { $ne: 'FollowNotifyBot' }});
-    
+    const users = await User.find({
+        username: {
+            $ne: 'FollowNotifyBot'
+        }
+    });
+
     const user = randomItem(users);
 
-    const botUser = await User.findOne({username: 'FollowNotifyBot'});
+    const botUser = await User.findOne({
+        username: 'FollowNotifyBot'
+    });
 
     const botFollowers = botUser.followers;
     const userFollowers = user.followers;
-    
+
     //FIND user followers that is not following me
     const usersToFollow = botFollowers
-                 .filter(x => !userFollowers.includes(x))
-                 .concat(userFollowers.filter(x => !botFollowers.includes(x)));
-    
+        .filter(x => !userFollowers.includes(x))
+        .concat(userFollowers.filter(x => !botFollowers.includes(x)));
+
     const singleUserToFollowId = randomItem(usersToFollow);
 
 
