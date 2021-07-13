@@ -212,10 +212,9 @@ exports.followUserFollower = async () => {
     const userFollowers = user.followers;
 
     //FIND user followers that is not following me
-    const usersToFollow = botFollowers
-        .filter(x => !userFollowers.includes(x))
-        .concat(userFollowers.filter(x => !botFollowers.includes(x)));
-
+    const usersToFollow = userFollowers
+        .filter(x => !botFollowers.includes(x));
+        
     const singleUserToFollowId = randomItem(usersToFollow);
 
 
@@ -238,9 +237,7 @@ exports.followUserFollower = async () => {
 
     await Bot.sendDirectMessage(followBotTwitterId, `Automatic following: @${singleUserToFollow.username}`)
 
-    // logger.info("Bot now following", singleUserToFollow)
-
-
+    logger.info("Bot now following", singleUserToFollow);
 }
 
 /**

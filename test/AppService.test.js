@@ -181,7 +181,7 @@ describe('AppService Test', () => {
        
         
         // @ts-ignore
-        User.findOne = jest.fn().mockResolvedValueOnce({followers: ["1", "5", "2"]}).mockResolvedValueOnce(["5", "3"]);
+        User.findOne = jest.fn().mockResolvedValueOnce({followers: ["1", "5", "2"]});
 
         const followUserMock = jest.fn();
 
@@ -197,7 +197,7 @@ describe('AppService Test', () => {
 
         expect(randomItem).toHaveBeenCalledTimes(2);
         expect(randomItem).toHaveBeenCalledWith([userFollower])
-        expect(randomItem).toHaveBeenCalledWith(['5', '3'])
+        expect(randomItem).toHaveBeenCalledWith(['3'])
         
 
         expect(User.find).toHaveBeenCalledTimes(1)
