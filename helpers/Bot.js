@@ -231,6 +231,77 @@ exports.getAllFollowers = async function (params) {
 /**
  * 
  * @param {{
+ *      next_cursor?:string,
+ *      user_id?:string, 
+ *      count?: number
+ *      auth: HttpConfigParam['oauth']
+ *   }} params 
+ * @returns {Promise<{ids:string[], next_cursor_str:string}>}
+ */
+exports.getFollowing = async function (params) {
+    return http(`${v1BaseUrl}/friends/ids.json`, {
+        method: 'get',
+        oauth: {
+            ...params.auth,
+            consumer_key: process.env.consumer_key,
+            consumer_secret: process.env.consumer_secret,
+        },
+        params: {
+            stringify_ids: true,
+            user_id: params.user_id,
+            ...(params.next_cursor ? {
+                cursor: params.next_cursor
+            } : null),
+            count: params.count,
+        }
+    });
+};
+
+/**
+ * 
+ * @param {{
+ *          user_id?:string, 
+ *          chunkSize: number,
+ *          auth: HttpConfigParam['oauth'],
+ *          rateLimitPoint: number
+ *      }} params 
+ * @returns {Promise<string[]>}
+ */
+exports.getAllFollowing = async function (params) {
+    let nextCursor = null;
+    let followers = []
+    //Pause after 10 calls
+ 
+    let callCount = 0;
+    do {
+        callCount++;
+
+        const result = await this.getFollowing({
+            auth: params.auth,
+            user_id: params.user_id,
+            count: params.chunkSize,
+            next_cursor: nextCursor,
+        });
+
+        followers = [...followers, ...result.ids];
+
+        nextCursor = result.next_cursor_str;
+
+        if(callCount % params.rateLimitPoint === 0) {
+            const _15minutes = 1000 * 60 * 15;
+            await pause(_15minutes)
+            
+        }
+    }
+    while(nextCursor && nextCursor!== '0');
+
+    return followers;
+    
+}
+
+/**
+ * 
+ * @param {{
  *      ids: String[]
  *      auth: HttpConfigParam['oauth']
  *   }} params 

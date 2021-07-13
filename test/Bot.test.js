@@ -174,6 +174,84 @@ describe('Bot Test', () => {
 
   });
 
+  it('Bot.getFollowing() should return correct value', async () => {
+    // @ts-ignore
+    http.mockImplementation(() => Promise.resolve("Response"));
+
+    
+    const response = Bot.getFollowing({
+      user_id: "1234",
+      auth:{}
+    })
+
+    expect(http).toHaveBeenCalledTimes(1);
+    expect(response).toBeInstanceOf(Promise)
+    expect(await response).toBe("Response")
+
+  });
+
+  it('Bot.getAllFollowing() should return all followers', async () => {
+   
+    jest.spyOn(Bot, 'getFollowing').mockReturnValueOnce(Promise.resolve({
+      ids: ['1', '2', '3'],
+      next_cursor_str: '4'
+    })).mockReturnValueOnce(Promise.resolve({
+      ids: ['4', '5', '6'],
+      next_cursor_str: null
+    }))
+
+    
+    const response = Bot.getAllFollowing({
+      user_id: "1234",
+      rateLimitPoint: 10,
+      auth:{
+
+      }, 
+      chunkSize: 4
+    })
+
+    
+
+    expect(response).toBeInstanceOf(Promise)
+    expect(await response).toEqual(['1','2', '3', '4', '5', '6'])
+    expect(Bot.getFollowing).toBeCalledTimes(2)
+
+  });
+  it('Bot.getAllFollowing() delays when callCount', async () => {
+    jest.spyOn(Bot, 'getFollowing').mockReturnValueOnce(Promise.resolve({
+      ids: ['1', '2', '3'],
+      next_cursor_str: '4'
+    }))
+    .mockReturnValueOnce(Promise.resolve({
+      ids: ['4', '5', '6'],
+      next_cursor_str: '4'
+    }))
+    .mockReturnValueOnce(Promise.resolve({
+      ids: ['7', '8', '9'],
+      next_cursor_str: null
+    }))
+
+    
+    const response = Bot.getAllFollowing({
+      user_id: "1234",
+      auth:{
+
+      }, 
+      rateLimitPoint: 2,
+      chunkSize: 4
+    })
+
+    
+
+    expect(response).toBeInstanceOf(Promise)
+    expect(await response).toEqual(['1', '2', '3', '4', '5', '6', '7', '8', '9'])
+    expect(Bot.getFollowing).toBeCalledTimes(3)
+    const _15minutes = 1000 * 60 * 15;
+    expect(pause).toBeCalledTimes(1)
+    expect(pause).toBeCalledWith(_15minutes)
+
+  });
+
   it('Bot.getFollowers() should return correct value', async () => {
     // @ts-ignore
     http.mockImplementation(() => Promise.resolve("Response"));
