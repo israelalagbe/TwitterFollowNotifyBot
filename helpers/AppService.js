@@ -83,13 +83,13 @@ exports.analyzeSubscriber = async (user) => {
 
     if (unfollowers.length) {
 
-        const users = await Bot.getUsers({
+        const users = (await Bot.getUsers({
             auth: {
                 token: user.access_token,
                 token_secret: user.access_token_secret
             },
             ids: unfollowers
-        });
+        })).filter((user)=> !(user.username === 'IsraelAlagbe' || user.username === 'FollowNotifyBot') );
 
         if (users.length) {
             const unFollowersUsernames = users.map((item) => '@' + item.username)
@@ -100,14 +100,14 @@ exports.analyzeSubscriber = async (user) => {
 
             await Bot.sendDirectMessage(user.twitter_user_id, message)
 
-            if (user.username === 'IsraelAlagbe' || user.username === 'FollowNotifyBot') {
-                logger.info("WrongFollowers debugging message", {
-                    username: user.username,
-                    message,
-                    oldFollowers: JSON.stringify(oldFollowers),
-                    newFollowers: JSON.stringify(newFollowers)
-                })
-            }
+            // if (user.username === 'IsraelAlagbe' || user.username === 'FollowNotifyBot') {
+            //     logger.info("WrongFollowers debugging message", {
+            //         username: user.username,
+            //         message,
+            //         oldFollowers: JSON.stringify(oldFollowers),
+            //         newFollowers: JSON.stringify(newFollowers)
+            //     })
+            // }
 
         }
 
@@ -202,8 +202,13 @@ exports.followUserFollower = async () => {
     const botUser = await User.findOne({
         username: 'FollowNotifyBot'
     });
-
+    /**
+     * @type {String[]}
+     */
     const botFollowers = botUser.followers;
+    /**
+     * @type {String[]}
+     */
     const userFollowers = user.followers;
 
     //FIND user followers that is not following me
@@ -237,3 +242,46 @@ exports.followUserFollower = async () => {
 
 
 }
+
+/**
+ * @param {string} username 
+ */
+exports.pruneFollowing = async (username) => {
+    const user = await User.findOne({
+        username
+    });
+
+    const followers = await Bot.getAllFollowers({
+        user_id: user.twitter_user_id,
+        chunkSize: 5000,
+        rateLimitPoint: 10,
+        auth: {
+            token: user.access_token,
+            token_secret: user.access_token_secret
+        }
+    });
+
+    const followings = await Bot.getAllFollowing({
+        user_id: user.twitter_user_id,
+        chunkSize: 5000,
+        rateLimitPoint: 10,
+        auth: {
+            token: user.access_token,
+            token_secret: user.access_token_secret
+        }
+    });
+
+    const nonFollowerFollowings = followings.filter((userId) => !followers.includes(userId));
+
+    
+    for(const userId of nonFollowerFollowings) {
+        await Bot.unfollowUser({
+            user_id: userId,
+            auth: {
+                token: user.access_token,
+                token_secret: user.access_token_secret
+            }
+        });
+    }
+    console.log("Done unfollowing")
+};

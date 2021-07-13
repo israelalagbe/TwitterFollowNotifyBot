@@ -1,6 +1,6 @@
 
 require('dotenv').config();
-const { analyzeSubscriber, advertiseBot ,followUserFollower } = require('./helpers/AppService');
+const { analyzeSubscriber, advertiseBot ,followUserFollower, pruneFollowing } = require('./helpers/AppService');
 const logger = require('./config/logger');
 const User = require('./models/user');
 const mongoose = require('mongoose');
@@ -24,18 +24,25 @@ mongoose.connect(process.env.mongodb_database_url, {useNewUrlParser: true, useUn
 (async () => {
     // const user = await User.findOne({username: "FollowNotifyBot"});
     try{
+
+
     //   const tweets = await Bot.searchTweets({
     //     count: 5,
     //     q: "I have built a Bot helps monitor your unfollowers and alerts you when someone unfollows you"
     // });
     // console.log(JSON.stringify(tweets[0]))
       // Bot.tweet({status: "Hello world!"});
-        await followUserFollower();
+        // await followUserFollower();
+
+
 
         // const twit = new Twit(config);
         // var filePath = 'public/botScreenshot.jpg'
         // const res = await Bot.uploadMedia(filePath)
         // console.log("Done", JSON.stringify(res))
+
+        pruneFollowing('FollowNotifyBot')
+
     }
     catch(e){
         console.error(e)

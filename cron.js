@@ -9,7 +9,7 @@ require('dotenv').config();
 const logger = require('./config/logger');
 
 
-const { analyzeSubscribersFollowers, advertiseBot, followUserFollower } = require('./helpers/AppService');
+const { analyzeSubscribersFollowers, advertiseBot, followUserFollower, pruneFollowing } = require('./helpers/AppService');
 
 const Bot = require('./helpers/Bot');
 const pause = require('./helpers/pause');
@@ -52,6 +52,21 @@ cron.schedule('0 */6 * * *', async () => {
     await followUserFollower();
   } catch (e) {
     logger.error("auto following cron error", e)
+    // process.exit(1);
+  }
+
+}, {
+  scheduled: true,
+  timezone: "Africa/Lagos"
+});
+
+
+cron.schedule('0 0 1 * *', async () => {
+  try {
+    logger.error("auto unfollowing started")
+    await pruneFollowing('FollowNotifyBot');
+  } catch (e) {
+    logger.error("auto unfollowing cron error", e)
     // process.exit(1);
   }
 

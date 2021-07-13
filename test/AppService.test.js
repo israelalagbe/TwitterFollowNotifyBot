@@ -32,7 +32,8 @@ describe('AppService Test', () => {
         
         const getAllFollowersMock = jest.fn(()=> Promise.resolve(['2', '3']));
         const getUsersMock = jest.fn(()=> Promise.resolve([
-            {id: '1', name: 'Israel', username: 'israel'}
+            {id: '1', name: 'Israel', username: 'israel'},
+            {id: '2', name: 'FollowNotifyBot', username: 'FollowNotifyBot'}
         ]));
 
         const sendDirectMessageMock = jest.fn(()=> Promise.resolve("Response"));
@@ -53,7 +54,7 @@ describe('AppService Test', () => {
         }
 
    
-        await AppService.analyzeSubscriber({...user})
+        await AppService.analyzeSubscriber({...user});
 
         expect(getAllFollowersMock).toHaveBeenCalledWith({
             user_id: user.twitter_user_id,
@@ -74,7 +75,9 @@ describe('AppService Test', () => {
                 token_secret: user.access_token_secret
             }, 
             ids: ["1"]
-        })
+        });
+
+        expect(humanizeArray).toHaveBeenCalledWith(["@israel"]);
 
         const message = "Hello MyName,\n@israel has unfollowed you!"
         expect(sendDirectMessageMock).toHaveBeenCalledWith(user.twitter_user_id, message)

@@ -343,6 +343,28 @@ exports.getUsers = async function (params) {
     });
 };
 
+/**
+ * 
+ * @param {{
+ *      user_id?:string, 
+ *      auth: HttpConfigParam['oauth']
+ *   }} params 
+ * @returns {Promise<{}>}
+ */
+ exports.unfollowUser = function (params) {
+    return http(`${v1BaseUrl}/friendships/destroy.json`, {
+        method: 'post',
+        oauth: {
+            ...params.auth,
+            consumer_key: process.env.consumer_key,
+            consumer_secret: process.env.consumer_secret,
+        },
+        params: {
+            user_id: params.user_id
+        }
+    });
+};
+
 
 /**
  * 
