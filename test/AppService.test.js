@@ -28,7 +28,7 @@ describe('AppService Test', () => {
         // @ts-ignore
         humanizeArray.mockImplementation( () => '@israel')
         // @ts-ignore
-        findUnfollowers.mockImplementation( () => ['1'])
+        findUnfollowers.mockImplementation( () => ['1', "4"])
         
         const getAllFollowersMock = jest.fn(()=> Promise.resolve(['2', '3']));
         const getUsersMock = jest.fn(()=> Promise.resolve([
@@ -46,7 +46,8 @@ describe('AppService Test', () => {
         const userSaveMock = jest.fn();
         const user = {
             name: "MyName",
-            followers: ["1", "2", "3"],
+            followers: ["1", "2", "3", "4"],
+            all_unfollows: ["4"],
             twitter_user_id: "twitter_id",
             access_token: "access token",
             access_token_secret: "access token secret",

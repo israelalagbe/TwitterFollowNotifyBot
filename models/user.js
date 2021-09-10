@@ -25,13 +25,17 @@ const userSchema = new mongoose.Schema({
     },
     access_token_secret: {
         type: String,
-        required: true,
+        required: true
     },
     followers_count: Number,
     following_count: Number,
     followers: [{
         type: String,
         required: true
+    }],
+    all_unfollows: [{
+        type: String,
+        default: []
     }]
 }, {
     timestamps: true
