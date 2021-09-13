@@ -77,7 +77,9 @@ exports.analyzeSubscriber = async (user) => {
   const unfollowers = findUnfollowers(oldFollowers, newFollowers);
 
   //To fix the bug of sample unfollower reported multiple time
-  const filteredUnfollowers = unfollowers.filter((unfollower) => !user.all_unfollows.includes(unfollower));
+  const filteredUnfollowers = unfollowers
+    .filter((unfollower) => !user.all_unfollows.includes(unfollower))
+    .slice(0, 10);
 
   if (filteredUnfollowers.length) {
     const users = (
