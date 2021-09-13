@@ -79,7 +79,7 @@ exports.analyzeSubscriber = async (user) => {
   //To fix the bug of sample unfollower reported multiple time
   const filteredUnfollowers = unfollowers
     .filter((unfollower) => !user.all_unfollows.includes(unfollower))
-    .slice(0, 10);
+    .slice(0, 20);
 
   if (filteredUnfollowers.length) {
     const users = (
