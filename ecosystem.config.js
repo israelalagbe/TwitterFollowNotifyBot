@@ -13,7 +13,7 @@ module.exports = {
         {
             name: 'bot-cron',
             script: 'cron.js',
-            max_memory_restart: '700M',
+            max_memory_restart: '300M',
             exec_mode : "fork",
             instances:"1"
         }
