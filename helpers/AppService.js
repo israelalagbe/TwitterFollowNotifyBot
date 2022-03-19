@@ -123,8 +123,9 @@ exports.analyzeSubscriber = async (user) => {
 exports.analyzeSubscribersFollowers = async () => {
   const analysisStart = Date.now();
 
-  const users = await User.find({});
-  for (const user of users) {
+  const chunkSize = 10;
+  const usersIterator = await this.getUsersByChunkSize(chunkSize);
+  for await (const user of usersIterator) {
     try {
       await this.analyzeSubscriber(user);
     } catch (e) {
@@ -271,4 +272,21 @@ exports.pruneFollowing = async (username) => {
     });
   }
   console.log("Done unfollowing");
+};
+
+exports.getUsersByChunkSize = async function * (chunkSize = 10) { 
+  
+  const limit = chunkSize;
+  let page = 1;
+  // let startAt = (page * limit) - limit;
+  const total = await User.countDocuments({});
+  
+  for(let startAt = 0; startAt < total; startAt += limit) {
+    const users = await User.find({}).skip(startAt).limit(limit);
+
+    for(const user of users) {
+      yield user;
+    }
+    
+  }
 };

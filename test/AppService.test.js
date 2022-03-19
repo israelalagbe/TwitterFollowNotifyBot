@@ -9,7 +9,7 @@ const User = require('../models/user');
 
 jest.mock('../helpers/randomItem');
 jest.mock('../helpers/pause');
-jest.mock('../models/user', () => jest.fn());
+jest.mock('../models/user');
 jest.mock('../helpers/humanizeArray', () => jest.fn());
 jest.mock('../helpers/findUnfollowers', () => jest.fn());
 jest.mock('../helpers/Bot', () => jest.fn());
@@ -90,8 +90,22 @@ describe('AppService Test', () => {
         const users = [{_id: 1}, {_id: 2}, {_id: 3}]
         // @ts-ignore
         User.find = jest.fn(() => {
-            return Promise.resolve(users)
+            return {
+                skip: jest.fn((skip) => {
+                    return {
+                        limit: jest.fn((limit) => {
+                            return Promise.resolve(users.slice(skip, skip + limit))
+                        })
+                    }
+                })
+            };
         });
+
+        // @ts-ignore
+        User.countDocuments = jest.fn(() => {
+            return Promise.resolve(users.length)
+        });
+
         jest.spyOn(AppService, 'analyzeSubscriber').mockReturnValueOnce(Promise.resolve())
 
         const runningTime = 1;
@@ -220,7 +234,36 @@ describe('AppService Test', () => {
         expect(sendDirectMessageMock).toHaveBeenCalledWith(followBotTwitterId, message)
     })
 
-    
+    it('getUsersByChunkSize test', async () => {
+        const users = Array(100).fill(null).map((_, i) => (new User({id: i+1, name: `user${i+1}`})));
+        // @ts-ignore
+        User.find = jest.fn(() => {
+            return {
+                skip: jest.fn((skip) => {
+                    return {
+                        limit: jest.fn((limit) => {
+                            return Promise.resolve(users.slice(skip, skip + limit))
+                        })
+                    }
+                })
+            };
+        });
+
+        // @ts-ignore
+        User.countDocuments = jest.fn(() => {
+            return Promise.resolve(users.length)
+        });
+        const chunkSize = 10;
+        const usersIterator = AppService.getUsersByChunkSize(chunkSize);
+        let index = 0;
+
+        for await(const user of usersIterator) {
+            expect(user).toMatchObject(users[index]);
+            index++;
+        }
+
+
+    });
 
 
 });
