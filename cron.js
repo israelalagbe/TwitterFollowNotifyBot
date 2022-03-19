@@ -46,19 +46,19 @@ mongoose.connect(process.env.mongodb_database_url, {useNewUrlParser: true, useUn
 
 
 // Run every 6 hours
-cron.schedule('0 */6 * * *', async () => {
-  try {
-    logger.error("auto following started")
-    await followUserFollower();
-  } catch (e) {
-    logger.error("auto following cron error", e)
-    // process.exit(1);
-  }
+// cron.schedule('0 */6 * * *', async () => {
+//   try {
+//     logger.error("auto following started")
+//     await followUserFollower();
+//   } catch (e) {
+//     logger.error("auto following cron error", e)
+//     // process.exit(1);
+//   }
 
-}, {
-  scheduled: true,
-  timezone: "Africa/Lagos"
-});
+// }, {
+//   scheduled: true,
+//   timezone: "Africa/Lagos"
+// });
 
 
 cron.schedule('0 0 1 * *', async () => {
