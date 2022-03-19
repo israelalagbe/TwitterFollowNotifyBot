@@ -397,10 +397,11 @@ exports.searchTweets = async function (params) {
  *  status: string,
  *  media_ids?: string, 
  *  in_reply_to_status_id?: string
+ *  auth?: HttpConfigParam['oauth']
  * }} param 
  * @returns {Promise}
  */
- exports.tweet = async function ({status, in_reply_to_status_id, media_ids}) {
+ exports.tweet = async function ({status, in_reply_to_status_id, media_ids, auth}) {
     
     if (typeof status !== 'string') {
         throw new Error('tweet must be of type String');
@@ -416,6 +417,7 @@ exports.searchTweets = async function (params) {
             token_secret: process.env.access_token_secret,
             consumer_key: process.env.consumer_key,
             consumer_secret: process.env.consumer_secret,
+            ...auth
         },
         body: {
             status,

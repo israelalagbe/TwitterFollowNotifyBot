@@ -47,7 +47,7 @@ router.post('/subscribe', async (req, res, next) => {
     res.redirect(`https://api.twitter.com/oauth/authorize?oauth_token=${result.oauth_token}`);
   } catch (e) {
     logger.error(e)
-    res.status(400).send("<h1>Opps, Something went went<h1/>");
+    res.status(400).send("<h1>Opps, Something went wrong<h1/>");
     
   }
 });
@@ -71,7 +71,7 @@ router.get('/success', async (req, res, next) => {
     
   } catch (e) {
     logger.error(e)
-    res.status(400).send("<h1>Opps, Something went went<h1/>");
+    res.status(400).send("<h1>Opps, Something went wrong<h1/>");
 
   }
 });
