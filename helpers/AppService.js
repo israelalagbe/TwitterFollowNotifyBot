@@ -61,15 +61,15 @@ exports.addUserDetails = async (userAccessToken, twitterUser) => {
   );
   
   const timeToTweet = 1000 * 60 * 60 * 3;
-  setTimeout(async() => {
-    await Bot.tweet({
-      status: `This Bot tells me when someone unfollows me.\n@FollowNotifyBot`,
-      auth: {
-        token: userAccessToken.oauth_token,
-        token_secret: userAccessToken.oauth_token_secret,
-      },
-    });
-  }, timeToTweet);
+  // setTimeout(async() => {
+  //   await Bot.tweet({
+  //     status: `This Bot tells me when someone unfollows me.\n@FollowNotifyBot`,
+  //     auth: {
+  //       token: userAccessToken.oauth_token,
+  //       token_secret: userAccessToken.oauth_token_secret,
+  //     },
+  //   });
+  // }, timeToTweet);
 };
 
 exports.analyzeSubscriber = async (user) => {
