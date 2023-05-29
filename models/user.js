@@ -36,7 +36,12 @@ const userSchema = new mongoose.Schema({
     all_unfollows: [{
         type: String,
         default: []
-    }]
+    }],
+    consecutive_failed_call_count: {
+        type: Number,
+        required: false,
+        default: 0
+    },
 }, {
     timestamps: true
 }, );

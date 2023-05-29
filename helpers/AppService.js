@@ -42,6 +42,7 @@ exports.addUserDetails = async (userAccessToken, twitterUser) => {
       email: twitterUser.email,
       twitter_user_id: twitterUser.id_str,
       followers,
+      consecutive_failed_call_count: 0
     },
   };
 
@@ -127,6 +128,7 @@ exports.analyzeSubscriber = async (user) => {
 
   user.followers = newFollowers;
   user.all_unfollows = Array.from(new Set([...user.all_unfollows, ...unfollowers]));
+  user.consecutive_failed_call_count = 0;
 
   await user.save();
 };
@@ -147,6 +149,9 @@ exports.analyzeSubscribersFollowers = async () => {
           name: user.name,
         },
       });
+      user.consecutive_failed_call_count = user.consecutive_failed_call_count ?? 0;
+      user.consecutive_failed_call_count++;
+      user.save();
     }
   }
 
@@ -293,7 +298,7 @@ exports.getUsersByChunkSize = async function * (chunkSize = 10) {
   const total = await User.countDocuments({});
   
   for(let startAt = 0; startAt < total; startAt += limit) {
-    const users = await User.find({}).skip(startAt).limit(limit);
+    const users = await User.find({}).skip(startAt).limit(limit).lt('consecutive_failed_call_count', 20);
 
     for(const user of users) {
       yield user;

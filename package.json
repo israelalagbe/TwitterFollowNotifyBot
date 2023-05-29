@@ -3,8 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "start2": "jest && node ./bin/www",
     "start": "jest && npm run start:server",
     "start:server": "pm2 reload ecosystem.config.js",
+    "start:server:fly": "pm2 kill && pm2 start ecosystem.config.js --no-daemon",
     "dev": "DEBUG=follownotifybot:* nodemon -e js,twig ./bin/www",
     "dev:cron": "DEBUG=follownotifybot:* nodemon cron.js",
     "test": "jest --watch"
@@ -31,6 +33,8 @@
   "devDependencies": {
     "@types/jest": "^26.0.23",
     "jest": "^26.6.3",
+    "nodemon": "^2.0.22",
+    "pm2": "^5.3.0",
     "supertest": "^6.1.3"
   },
   "jest": {
