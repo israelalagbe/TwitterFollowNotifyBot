@@ -94,11 +94,7 @@ describe('AppService Test', () => {
                 skip: jest.fn((skip) => {
                     return {
                         limit: jest.fn((limit) => {
-                            return {
-                                lt: jest.fn(() => {
-                                    return Promise.resolve(users.slice(skip, skip + limit))
-                                }),
-                            }
+                            return Promise.resolve(users.slice(skip, skip + limit))
                         }),
                     }
                 })
@@ -246,11 +242,7 @@ describe('AppService Test', () => {
                 skip: jest.fn((skip) => {
                     return {
                         limit: jest.fn((limit) => {
-                            return {
-                                lt: jest.fn(() => {
-                                    return Promise.resolve(users.slice(skip, skip + limit))
-                                }),
-                            }
+                            return Promise.resolve(users.slice(skip, skip + limit))
                         }),
                     }
                 })

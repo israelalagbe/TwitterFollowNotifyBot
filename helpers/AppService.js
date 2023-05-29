@@ -298,9 +298,12 @@ exports.getUsersByChunkSize = async function * (chunkSize = 10) {
   const total = await User.countDocuments({});
   
   for(let startAt = 0; startAt < total; startAt += limit) {
-    const users = await User.find({}).skip(startAt).limit(limit).lt('consecutive_failed_call_count', 20);
+    const users = await User.find({}).skip(startAt).limit(limit);
 
     for(const user of users) {
+      if(user.consecutive_failed_call_count > 20) {
+        continue;
+      }
       yield user;
     }
     
