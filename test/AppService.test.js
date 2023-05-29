@@ -87,15 +87,19 @@ describe('AppService Test', () => {
     
 
     it('analyzeSubscribersFollowers test', async () => {
-        const users = [{_id: 1}, {_id: 2}, {_id: 3}]
+        const users = [{_id: 1, save: () => {}}, {_id: 2, save: () => {}}, {_id: 3, save: () => {}}]
         // @ts-ignore
         User.find = jest.fn(() => {
             return {
                 skip: jest.fn((skip) => {
                     return {
                         limit: jest.fn((limit) => {
-                            return Promise.resolve(users.slice(skip, skip + limit))
-                        })
+                            return {
+                                lt: jest.fn(() => {
+                                    return Promise.resolve(users.slice(skip, skip + limit))
+                                }),
+                            }
+                        }),
                     }
                 })
             };
@@ -114,9 +118,9 @@ describe('AppService Test', () => {
 
         await AppService.analyzeSubscribersFollowers()
         expect(AppService.analyzeSubscriber).toHaveBeenCalledTimes(3)
-        expect(AppService.analyzeSubscriber).toHaveBeenCalledWith({_id: 1})
-        expect(AppService.analyzeSubscriber).toHaveBeenCalledWith({_id: 2})
-        expect(AppService.analyzeSubscriber).toHaveBeenCalledWith({_id: 3})
+        expect(AppService.analyzeSubscriber).toHaveBeenCalledWith(expect.objectContaining({_id: 1}))
+        expect(AppService.analyzeSubscriber).toHaveBeenCalledWith(expect.objectContaining({_id: 2}))
+        expect(AppService.analyzeSubscriber).toHaveBeenCalledWith(expect.objectContaining({_id: 3}))
 
         expect(pause).toHaveBeenCalledTimes(1)
         const breakTime = 1000 * 60 * 60 * 2
@@ -242,8 +246,12 @@ describe('AppService Test', () => {
                 skip: jest.fn((skip) => {
                     return {
                         limit: jest.fn((limit) => {
-                            return Promise.resolve(users.slice(skip, skip + limit))
-                        })
+                            return {
+                                lt: jest.fn(() => {
+                                    return Promise.resolve(users.slice(skip, skip + limit))
+                                }),
+                            }
+                        }),
                     }
                 })
             };
