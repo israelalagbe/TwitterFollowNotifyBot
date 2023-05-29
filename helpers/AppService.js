@@ -149,7 +149,7 @@ exports.analyzeSubscribersFollowers = async () => {
           name: user.name,
         },
       });
-      user.consecutive_failed_call_count = user.consecutive_failed_call_count ?? 0;
+      user.consecutive_failed_call_count = user.consecutive_failed_call_count || 0;
       user.consecutive_failed_call_count++;
       user.save();
     }
