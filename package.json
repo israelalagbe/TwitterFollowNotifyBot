@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start2": "jest && node ./bin/www",
+    "start_web": "jest && node ./bin/www",
+    "start_cron": "jest && node cron.js",
     "start": "jest && npm run start:server",
     "start:server": "pm2 reload ecosystem.config.js",
     "start:server:fly": "pm2 kill && pm2 start ecosystem.config.js --no-daemon",

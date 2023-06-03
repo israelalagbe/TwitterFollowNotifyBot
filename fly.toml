@@ -1,0 +1,29 @@
+# fly.toml file generated for follow-notify-bot on 2023-03-25T10:34:09+01:00
+
+app = "follow-notify-bot"
+kill_signal = "SIGINT"
+kill_timeout = 5
+mounts = []
+primary_region = "lhr"
+processes = []
+
+[env]
+  PORT = "7001"
+
+[[services]]
+  internal_port = 7001
+  processes = ["app"]
+  protocol = "tcp"
+  [services.concurrency]
+    hard_limit = 25
+    soft_limit = 20
+    type = "connections"
+
+  [[services.ports]]
+    force_https = true
+    handlers = ["http"]
+    port = 80
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
