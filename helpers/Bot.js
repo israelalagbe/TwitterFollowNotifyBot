@@ -324,6 +324,37 @@ exports.getUsers = async function (params) {
 /**
  * 
  * @param {{
+*      ids: String[]
+*      auth: HttpConfigParam['oauth']
+*   }} params 
+* @returns {Promise<{id: string, name: string, username: string}[]>}
+*/
+exports.getUsersV1 = async function (params) {
+   return http(`${v1BaseUrl}/users/lookup.json`, {
+       method: 'get',
+       oauth: {
+           ...params.auth,
+           consumer_key: process.env.consumer_key,
+           consumer_secret: process.env.consumer_secret,
+       },
+       params: {
+            user_id: params.ids.join(',')
+       }
+   }).then((result) => {
+        return (result || []).map((user) => {
+            return {
+                id: user.id_str,
+                name: user.name,
+                username: user.screen_name
+            }
+        })
+    });
+};
+
+
+/**
+ * 
+ * @param {{
  *      user_id?:string, 
  *      auth: HttpConfigParam['oauth']
  *   }} params 

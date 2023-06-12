@@ -40,7 +40,7 @@ describe('AppService Test', () => {
 
         // @ts-ignore
         Bot.getAllFollowers = getAllFollowersMock;
-        Bot.getUsers = getUsersMock;
+        Bot.getUsersV1 = getUsersMock;
         Bot.sendDirectMessage = sendDirectMessageMock;
         
         const userSaveMock = jest.fn();

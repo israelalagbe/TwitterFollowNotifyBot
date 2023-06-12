@@ -95,7 +95,7 @@ exports.analyzeSubscriber = async (user) => {
 
   if (filteredUnfollowers.length) {
     const users = (
-      await Bot.getUsers({
+      await Bot.getUsersV1({
         auth: {
           token: user.access_token,
           token_secret: user.access_token_secret,
