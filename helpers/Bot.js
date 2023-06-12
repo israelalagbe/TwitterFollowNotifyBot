@@ -348,6 +348,9 @@ exports.getUsersV1 = async function (params) {
                 username: user.screen_name
             }
         })
+    }).catch((e) => {
+        console.error(e)
+        return [];
     });
 };
 
