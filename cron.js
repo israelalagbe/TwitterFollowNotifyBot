@@ -9,9 +9,9 @@ require('dotenv').config();
 const logger = require('./config/logger');
 
 
-const { analyzeSubscribersFollowers, advertiseBot, followUserFollower, pruneFollowing } = require('./helpers/AppService');
+const { analyzeSubscribersFollowers, advertiseBot, followUserFollower, pruneFollowing } = require('./helpers/appService');
 
-const Bot = require('./helpers/Bot');
+const Bot = require('./helpers/bot');
 const pause = require('./helpers/pause');
 
 

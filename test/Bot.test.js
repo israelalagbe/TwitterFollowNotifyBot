@@ -1,5 +1,5 @@
 const Twit = require('twit');
-const Bot = require('../helpers/Bot');
+const Bot = require('../helpers/bot');
 // @ts-ignore
 const getPromiseCallback = require('../helpers/getPromiseCallback');
 const http = require('../helpers/http');
@@ -19,7 +19,7 @@ const pause = require('../helpers/pause');
 jest.mock('twit');
 
 
-jest.mock('../helpers/rate_limiters', () => ({
+jest.mock('../helpers/RateLimiters', () => ({
   limitFollowersCall(){
     return Promise.resolve("yes")
   }

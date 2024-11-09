@@ -1,10 +1,10 @@
 
 require('dotenv').config();
-const { analyzeSubscriber, advertiseBot ,followUserFollower, pruneFollowing } = require('./helpers/AppService');
+const { analyzeSubscriber, advertiseBot ,followUserFollower, pruneFollowing } = require('./helpers/appService');
 const logger = require('./config/logger');
 const User = require('./models/user');
 const mongoose = require('mongoose');
-const Bot = require('./helpers/Bot');
+const Bot = require('./helpers/bot');
 const Twit = require('twit');
 
 const config = {

@@ -1,6 +1,6 @@
 
-const AppService = require('../helpers/AppService');
-const Bot = require('../helpers/Bot');
+const AppService = require('../helpers/appService');
+const Bot = require('../helpers/bot');
 const findUnfollowers = require('../helpers/findUnfollowers');
 const humanizeArray = require('../helpers/humanizeArray');
 const pause = require('../helpers/pause');
@@ -12,7 +12,7 @@ jest.mock('../helpers/pause');
 jest.mock('../models/user');
 jest.mock('../helpers/humanizeArray', () => jest.fn());
 jest.mock('../helpers/findUnfollowers', () => jest.fn());
-jest.mock('../helpers/Bot', () => jest.fn());
+jest.mock('../helpers/bot', () => jest.fn());
 jest.mock("../config/logger", () => ({info: jest.fn(), error: jest.fn()}));
 
 describe('AppService Test', () => {
