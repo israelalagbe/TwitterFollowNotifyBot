@@ -44,5 +44,15 @@
     "coveragePathIgnorePatterns": [
       "/node_modules/"
     ]
-  }
+  },
+  "contributors": [
+    {
+      "name": "Israel Alagbe",
+      "description": "Main contributor (Backend + Frontend)"
+    },
+    {
+      "name": "Elizabeth Meshioye",
+      "description": "Frontend Contributor"
+    }
+  ]
 }
